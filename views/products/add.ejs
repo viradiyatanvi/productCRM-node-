@@ -1,0 +1,77 @@
+  <%- include('../layout') %>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div class="main-content" style="margin-top: 100px;">
+    <div class="container">
+
+      <% if (error) { %>
+        <div class="alert alert-danger">
+          <%= error %>
+        </div>
+        <% } %>
+
+          <form method="POST" enctype="multipart/form-data" style="margin-top: -70px;">
+            <div class="mb-3">
+              <label>Name</label>
+              <input class="form-control" name="name" required value="<%= formData.name || '' %>" />
+            </div>
+
+            <div class="mb-3">
+              <label>Category</label>
+              <input class="form-control" name="category" required value="<%= formData.category || '' %>" />
+            </div>
+
+            <div class="mb-3">
+              <label>Price</label>
+              <input class="form-control" type="number" name="price" step="0.01" required
+                value="<%= formData.price || '' %>" />
+            </div>
+
+            <div class="mb-3">
+              <label>Stock Quantity</label>
+              <input class="form-control" type="number" name="stockQuantity" required
+                value="<%= formData.stockQuantity || '' %>" />
+            </div>
+
+            <div class="mb-3">
+              <label>Description</label>
+              <textarea class="form-control" name="description"><%= formData.description || '' %></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label>Features</label>
+              <textarea class="form-control" name="features"
+                placeholder="One per line"><%= formData.features || '' %></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label>Images</label>
+              <input class="form-control" type="file" name="images" multiple />
+            </div>
+
+            <div class="mb-3">
+              <label>Status</label>
+              <select class="form-select" name="status">
+                <option value="active" <%=formData.status==='active' ? 'selected' : '' %>>Active</option>
+                <option value="inactive" <%=formData.status==='inactive' ? 'selected' : '' %>>Inactive</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add Product</button>
+          </form>
+    </div>
+
+   </div>
+
+</body>
+
+</html>

@@ -1,0 +1,332 @@
+<%- include('../layout') %>
+
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    </head>
+
+    <body>
+        <div class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-plus text-primary me-2"></i>
+                    Leads Management
+                </h4>
+                <a href="/leads/add" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>
+                    Add New Lead
+                </a>
+            </div>
+
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-control" name="search" value="<%= query.search || '' %>"
+                                placeholder="Name, email, or phone">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">All Status</option>
+                                <option value="new" <%=query.status==='new' ? 'selected' : '' %>>New</option>
+                                <option value="contacted" <%=query.status==='contacted' ? 'selected' : '' %>>Contacted
+                                </option>
+                                <option value="interested" <%=query.status==='interested' ? 'selected' : '' %>
+                                    >Interested
+                                </option>
+                                <option value="not-interested" <%=query.status==='not-interested' ? 'selected' : '' %>
+                                    >Not
+                                    Interested</option>
+                                <option value="converted" <%=query.status==='converted' ? 'selected' : '' %>>Converted
+                                </option>
+                                <option value="lost" <%=query.status==='lost' ? 'selected' : '' %>>Lost</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Source</label>
+                            <select class="form-select" name="source">
+                                <option value="">All Sources</option>
+                                <option value="web" <%=query.source==='web' ? 'selected' : '' %>>Website</option>
+                                <option value="manual" <%=query.source==='manual' ? 'selected' : '' %>>Manual</option>
+                                <option value="excel" <%=query.source==='excel' ? 'selected' : '' %>>Excel Import
+                                </option>
+                                <option value="referral" <%=query.source==='referral' ? 'selected' : '' %>>Referral
+                                </option>
+                                <option value="social-media" <%=query.source==='social-media' ? 'selected' : '' %>
+                                    >Social Media
+                                </option>
+                                <option value="advertisement" <%=query.source==='advertisement' ? 'selected' : '' %>
+                                    >Advertisement</option>
+                            </select>
+                        </div>
+
+                        <% if (user.role==='admin' || user.role==='sales' ) { %>
+                            <div class="col-md-3">
+                                <label class="form-label">Assigned To</label>
+                                <select class="form-select" name="assignedTo">
+                                    <option value="">All Assignments</option>
+                                    <% users.forEach(u=> { %>
+                                        <option value="<%= u._id %>" <%=query.assignedTo===u._id.toString() ? 'selected'
+                                            : '' %>
+                                            >
+                                            <%= u.name %>
+                                        </option>
+                                        <% }) %>
+                                </select>
+                            </div>
+                            <% } %>
+
+                                <div class="col-md-2">
+                                    <label class="form-label">&nbsp;</label>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <a href="/leads" class="btn btn-outline-secondary">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Leads Table -->
+            <div class="card">
+                <div class="card-body">
+                    <% if (leads.length> 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Lead Details</th>
+                                        <th>Contact</th>
+                                        <th>Product Interest</th>
+                                        <th>Status</th>
+                                        <th>Assigned To</th>
+                                        <th>Source</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% leads.forEach(lead=> { %>
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <strong>
+                                                        <%= lead.name %>
+                                                    </strong>
+                                                    <% if (lead.city) { %>
+                                                        <small class="d-block text-muted">
+                                                            <i class="fas fa-map-marker-alt me-1"></i>
+                                                            <%= lead.city %>
+                                                        </small>
+                                                        <% } %>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <small class="d-block">
+                                                        <i class="fas fa-envelope me-1"></i>
+                                                        <a href="mailto:<%= lead.email %>">
+                                                            <%= lead.email %>
+                                                        </a>
+                                                    </small>
+                                                    <small class="d-block">
+                                                        <i class="fas fa-phone me-1"></i>
+                                                        <a href="tel:<%= lead.phone %>">
+                                                            <%= lead.phone %>
+                                                        </a>
+                                                    </small>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <% if (lead.interestedProduct) { %>
+                                                    <span class="badge bg-info">
+                                                        <%= lead.interestedProduct.name %>
+                                                    </span>
+                                                    <small class="d-block text-muted">
+                                                        ₹<%= lead.interestedProduct.price.toLocaleString() %>
+                                                    </small>
+                                                    <% } else { %>
+                                                        <span class="text-muted">-</span>
+                                                        <% } %>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-<%= 
+                                lead.status === 'new' ? 'primary' : 
+                                lead.status === 'contacted' ? 'info' :
+                                lead.status === 'interested' ? 'success' :
+                                lead.status === 'not-interested' ? 'danger' :
+                                lead.status === 'converted' ? 'success' : 'secondary' 
+                            %>">
+                                                    <%= lead.getStatusDisplay() %>
+                                                </span>
+                                                <% if (lead.nextFollowUpDate) { %>
+                                                    <small class="d-block text-muted">
+                                                        Next: <%= moment(lead.nextFollowUpDate).format('MMM DD, HH:mm')
+                                                            %>
+                                                    </small>
+                                                    <% } %>
+                                            </td>
+                                            <td>
+                                                <% if (lead.assignedTo) { %>
+                                                    <span class="badge bg-light text-dark">
+                                                        <%= lead.assignedTo.name %>
+                                                    </span>
+                                                    <% } else { %>
+                                                        <span class="text-muted">Unassigned</span>
+                                                        <% } %>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-dark bg-outline-secondary">
+                                                    <%= lead.source.charAt(0).toUpperCase() +
+                                                        lead.source.slice(1).replace('-', ' ' ) %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    <%= moment(lead.createdAt).format('MMM DD, YYYY') %>
+                                                        <span class="d-block">
+                                                            <%= moment(lead.createdAt).fromNow() %>
+                                                        </span>
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="/leads/<%= lead._id %>"
+                                                        class="btn btn-sm btn-outline-primary" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+
+                                                    <% if (user.role==='admin' || user.role==='sales' ||
+                                                        (user.role==='telecaller' && lead.assignedTo &&
+                                                        lead.assignedTo._id.toString()===user._id)) { %>
+                                                        <a href="/leads/edit/<%= lead._id %>"
+                                                            class="btn btn-sm btn-outline-secondary" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <% } %>
+
+                                                            <% if (lead.status==='interested' && (user.role==='admin' ||
+                                                                user.role==='sales' )) { %>
+                                                                <button class="btn btn-sm btn-success"
+                                                                    onclick="convertLead('<%= lead._id %>')"
+                                                                    title="Convert to Customer">
+                                                                    <i class="fas fa-user-check"></i>
+                                                                </button>
+                                                                <% } %>
+
+                                                                    <% if (lead.assignedTo &&
+                                                                        (lead.assignedTo._id.toString()===user._id ||
+                                                                        user.role==='admin' || user.role==='sales' )) {
+                                                                        %>
+                                                                        <a href="/followup/add?leadId=<%= lead._id %>"
+                                                                            class="btn btn-sm btn-warning"
+                                                                            title="Add Follow-up">
+                                                                            <i class="fas fa-phone"></i>
+                                                                        </a>
+                                                                        <% } %>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <% if (totalPages> 1) { %>
+                            <nav aria-label="Leads pagination" class="mt-4">
+                                <ul class="pagination">
+                                    <% if (currentPage> 1) { %>
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                                href="?page=<%= currentPage - 1 %>&<%= new URLSearchParams(query).toString() %>">
+                                                <i class="fas fa-chevron-left"></i>
+                                            </a>
+                                        </li>
+                                        <% } %>
+
+                                            <% for (let i=Math.max(1, currentPage - 2); i <=Math.min(totalPages,
+                                                currentPage + 2); i++) { %>
+                                                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                                    <a class="page-link"
+                                                        href="?page=<%= i %>&<%= new URLSearchParams(query).toString() %>">
+                                                        <%= i %>
+                                                    </a>
+                                                </li>
+                                                <% } %>
+
+                                                    <% if (currentPage < totalPages) { %>
+                                                        <li class="page-item">
+                                                            <a class="page-link"
+                                                                href="?page=<%= currentPage + 1 %>&<%= new URLSearchParams(query).toString() %>">
+                                                                <i class="fas fa-chevron-right"></i>
+                                                            </a>
+                                                        </li>
+                                                        <% } %>
+                                </ul>
+                            </nav>
+                            <% } %>
+
+                                <% } else { %>
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-user-plus text-muted"
+                                            style="font-size: 4rem; opacity: 0.3;"></i>
+                                        <h5 class="mt-3 text-muted">No Leads Found</h5>
+                                        <p class="text-muted">Start by adding your first lead to the system</p>
+                                        <a href="/leads/add" class="btn btn-primary">
+                                            <i class="fas fa-plus me-1"></i>
+                                            Add New Lead
+                                        </a>
+                                    </div>
+                                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function convertLead(leadId) {
+                if (confirm('Are you sure you want to convert this lead to a customer?')) {
+                    fetch(`/leads/convert/${leadId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                location.reload();
+                            } else {
+                                alert('Error: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            alert('An error occurred while converting the lead');
+                            console.error('Error:', error);
+                        });
+                }
+            }
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    </body>
+
+    </html>

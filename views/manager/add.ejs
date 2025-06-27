@@ -1,0 +1,95 @@
+<%- include('../layout') %>
+
+<div class="main-content">
+  <div class="container mt-4">
+    <h3>Add Manager</h3>
+
+    <% if (typeof error !== 'undefined') { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+
+    <form action="/manager/add" method="POST">
+      <div class="row">
+        <% const fields = [
+          ['Full Name', 'fullName', 'text', true],
+          ['Email', 'email', 'email'],
+          ['Phone', 'phone', 'text', true],
+          ['Alternate Phone', 'alternatePhone', 'text'],
+          ['Company', 'company', 'text'],
+          ['Notes', 'notes', 'textarea']
+        ]; %>
+
+        <% fields.forEach(([label, name, type, required]) => { %>
+          <div class="col-md-<%= type === 'textarea' ? 12 : 6 %> mb-3">
+            <label><%= label %> <%= required ? '*' : '' %></label>
+            <% if (type === 'textarea') { %>
+              <textarea name="<%= name %>" class="form-control"><%= formData[name] || '' %></textarea>
+            <% } else { %>
+              <input type="<%= type %>" name="<%= name %>" class="form-control"
+                     <%= required ? 'required' : '' %> value="<%= formData[name] || '' %>">
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+
+      <h5 class="mt-4">Addresses</h5>
+      <div id="addressContainer">
+        <div class="row mb-3 address-group">
+          <div class="col-md-3">
+            <input type="text" name="addresses[0][address]" placeholder="Address" class="form-control" required>
+          </div>
+          <div class="col-md-2">
+            <input type="text" name="addresses[0][city]" placeholder="City" class="form-control" required>
+          </div>
+          <div class="col-md-2">
+            <input type="text" name="addresses[0][state]" placeholder="State" class="form-control" required>
+          </div>
+          <div class="col-md-2">
+            <input type="text" name="addresses[0][pincode]" placeholder="Pincode" class="form-control" required>
+          </div>
+          <div class="col-md-2">
+            <button type="button" class="btn btn-danger" onclick="removeAddress(this)">❌</button>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-success btn-sm mb-3" onclick="addAddress()">➕ Add Address</button>
+
+      <div class="mt-3">
+        <button type="submit" class="btn btn-primary">💾 Save</button>
+        <a href="/manager" class="btn btn-secondary">↩️ Back</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let addressIndex = 1;
+  function addAddress() { // new address joint karne k liye use hota he
+    const container = document.getElementById("addressContainer");
+    const html = `
+      <div class="row mb-3 address-group">
+        <div class="col-md-3">
+          <input type="text" name="addresses[\${addressIndex}][address]" placeholder="Address" class="form-control" required>
+        </div>
+        <div class="col-md-2">
+          <input type="text" name="addresses[\${addressIndex}][city]" placeholder="City" class="form-control" required>
+        </div>
+        <div class="col-md-2">
+          <input type="text" name="addresses[\${addressIndex}][state]" placeholder="State" class="form-control" required>
+        </div>
+        <div class="col-md-2">
+          <input type="text" name="addresses[\${addressIndex}][pincode]" placeholder="Pincode" class="form-control" required>
+        </div>
+        <div class="col-md-2">
+          <button type="button" class="btn btn-danger" onclick="removeAddress(this)">❌</button>
+        </div>
+      </div>`;
+    container.insertAdjacentHTML("beforeend", html);
+    addressIndex++;
+  }
+
+  function removeAddress(button) {
+    button.closest('.address-group').remove(); // address ko remvie karne k liye use hota he
+  }
+</script>

@@ -1,0 +1,123 @@
+<%- include('../layout') %>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div class="main-content">
+    <div class="container mt-4">
+      <h3>
+        <%= title %>
+      </h3>
+
+      <!-- Filter -->
+      <form method="GET" class="row g-3 mb-4">
+        <!-- Call Status Filter -->
+        <!-- <div class="col-md-3">
+      <label class="form-label">Call Status</label>
+      <select name="status" class="form-select" onchange="this.form.submit()">
+        <option value="">All</option>
+        <option value="interested" <%= query.status === 'interested' ? 'selected' : '' %>>Interested</option>
+        <option value="Not interested" <%= query.status === 'Not interested' ? 'selected' : '' %>>Not Interested</option>
+        <option value="Callback Required" <%= query.status === 'Callback Required' ? 'selected' : '' %>>Callback Required</option>
+        <option value="No Response" <%= query.status === 'No Response' ? 'selected' : '' %>>No Response</option>
+        <option value="Wrong Number" <%= query.status === 'Wrong Number' ? 'selected' : '' %>>Wrong Number</option>
+        <option value="Busy" <%= query.status === 'Busy' ? 'selected' : '' %>>Busy</option>
+      </select>
+    </div> -->
+
+        <!-- <% if (user.role !=='telecaller' ) { %>
+          <div class="col-md-3">
+            <label class="form-label">Telecaller</label>
+            <select name="user" class="form-select" onchange="this.form.submit()">
+              <option value="">All</option>
+              <% users.forEach(u=> { %>
+                <option value="<%= u._id %>" <%=query.user==u._id ? 'selected' : '' %>><%= u.name %>
+                </option>
+                <% }) %>
+            </select>
+          </div>
+          <% } %> -->
+      </form>
+
+      <!-- Follow-up Table -->
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Lead Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Telecaller</th>
+              <th>Status</th>
+              <th>Remarks</th>
+              <th>Next Follow-up</th>
+              <th>Followed On</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (followups.length===0) { %>
+              <tr>
+                <td colspan="9" class="text-center">No follow-ups found.</td>
+              </tr>
+              <% } else { %>
+                <% followups.forEach((f, i)=> { %>
+                  <tr>
+                    <td>
+                      <%= (currentPage - 1) * 15 + i + 1 %>
+                    </td>
+                    <td>
+                      <%= f.lead?.name || 'N/A' %>
+                    </td>
+                    <td>
+                      <%= f.lead?.email || '-' %>
+                    </td>
+                    <td>
+                      <%= f.lead?.phone || '-' %>
+                    </td>
+                    <td>
+                      <%= f.user?.name || 'N/A' %>
+                    </td>
+                    <td>
+                      <%= f.callStatus || '-' %>
+                    </td>
+                    <td>
+                      <%= f.remarks || '-' %>
+                    </td>
+                    <td>
+                      <%= f.nextFollowUpDate ? moment(f.nextFollowUpDate).format('DD-MM-YYYY') : '-' %>
+                    </td>
+                    <td>
+                      <%= moment(f.createdAt).format('DD-MM-YYYY hh:mm A') %>
+                    </td>
+                  </tr>
+                  <% }) %>
+                    <% } %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <nav>
+        <ul class="pagination justify-content-center">
+          <% for (let i=1; i <=totalPages; i++) { %>
+            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+              <a class="page-link" href="?page=<%= i %>&status=<%= query.status || '' %>&user=<%= query.user || '' %>">
+                <%= i %>
+              </a>
+            </li>
+            <% } %>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</body>
+
+</html>

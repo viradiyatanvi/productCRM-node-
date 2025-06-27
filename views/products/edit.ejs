@@ -1,0 +1,112 @@
+<%- include('../layout') %>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Product</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    .main-content2 {
+      max-width: 700px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    input[type="file"] {
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 12px;
+      font-size: 1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    img {
+      margin: 10px 10px 0 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 100px;
+    }
+
+    p {
+      margin: 20px 0 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-content">
+    <div class="main-content2">
+      <form method="POST" enctype="multipart/form-data">
+      <input name="name" required type="text" placeholder="Product Name" value="<%= product.name %>" />
+      <input name="category" required type="text" placeholder="Category" value="<%= product.category %>" />
+      <input name="price" required type="number" step="0.01" placeholder="Price" value="<%= product.price %>" />
+      <input name="stockQuantity" required type="number" placeholder="Stock Quantity" value="<%= product.stockQuantity %>" />
+      
+      <textarea name="description" placeholder="Description"><%= product.description %></textarea>
+      <textarea name="features" placeholder="One feature per line"><%= product.features.join('\n') %></textarea>
+
+      <p>Current Images:</p>
+      <% product.images.forEach(img => { %>
+        <img src="<%= img %>" />
+      <% }) %>
+
+      <input type="file" name="images" multiple />
+
+      <select name="status">
+        <option value="active" <%= product.status === 'active' ? 'selected' : '' %>>Active</option>
+        <option value="inactive" <%= product.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+      </select>
+
+      <button>Update Product</button>
+    </form>
+    </div>
+  </div>
+</body>
+
+</html>

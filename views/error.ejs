@@ -1,0 +1,13 @@
+<%- include('layout') %>
+
+    <div class="main-content">
+        <div class="container mt-5">
+            <div class="alert alert-danger text-center">
+                <h4>🚫 Access Denied</h4>
+                <p>
+                    <%= typeof message !=='undefined' ? message : "Only the admin is allowed" %>
+                </p>
+                <a href="/auth/login" class="btn btn-primary mt-3">🔙 Go Back to Home</a>
+            </div>
+        </div>
+    </div>

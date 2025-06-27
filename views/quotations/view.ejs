@@ -1,0 +1,88 @@
+<%- include('../layout') %>
+
+  <div class="main-content">
+    <div class="container mt-4">
+      <h2>Quotation Details</h2>
+
+      <p><strong>Customer:</strong>
+        <%= quotation.customer?.name || 'N/A' %>
+      </p>
+      <p><strong>Email:</strong>
+        <%= quotation.customer?.email || 'N/A' %>
+      </p>
+
+      <p><strong>Status:</strong>
+        <%= quotation.getStatusDisplay() %>
+      </p>
+      <p><strong>Valid Until:</strong>
+        <%= moment(quotation.validUntil).format('DD MMM YYYY') %>
+      </p>
+      <p><strong>Created At:</strong>
+        <%= moment(quotation.createdAt).format('DD MMM YYYY') %>
+      </p>
+
+      <h4>Products</h4>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Discount</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% quotation.products.forEach((item, idx)=> { %>
+            <tr>
+              <td>
+                <%= idx + 1 %>
+              </td>
+              <td>
+                <%= item.product?.name || 'N/A' %>
+              </td>
+              <td>
+                <%= item.product?.category || 'N/A' %>
+              </td>
+              <td>
+                <%= item.quantity || 0 %>
+              </td>
+              <td>₹<%= item.price.toFixed(2) %>
+              </td>
+              <td>₹<%= (item.discount || 0).toFixed(2) %>
+              </td>
+              <td>₹<%= ((item.price * item.quantity) - (item.discount || 0)).toFixed(2) %>
+              </td>
+            </tr>
+            <% }) %>
+        </tbody>
+      </table>
+
+      <h5>Summary</h5>
+      <p><strong>Total Amount:</strong> ₹<%= quotation.totalAmount.toFixed(2) %>
+      </p>
+      <p><strong>Discount:</strong> ₹<%= quotation.discount.toFixed(2) %>
+      </p>
+      <p><strong>Tax:</strong> ₹<%= quotation.tax.toFixed(2) %>
+      </p>
+      <p><strong>Final Amount:</strong> ₹<%= quotation.finalAmount.toFixed(2) %>
+      </p>
+
+      <% if (quotation.terms) { %>
+        <h5>Terms</h5>
+        <p>
+          <%= quotation.terms %>
+        </p>
+        <% } %>
+
+          <% if (quotation.notes) { %>
+            <h5>Notes</h5>
+            <p>
+              <%= quotation.notes %>
+            </p>
+            <% } %>
+
+    </div>
+  </div>

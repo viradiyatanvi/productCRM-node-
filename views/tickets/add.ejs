@@ -1,0 +1,266 @@
+<%- include('../layout') %>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="main-content mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">
+                <i class="fas fa-ticket-alt text-primary me-2"></i>
+                Create Support Ticket
+            </h4>
+            <a href="/tickets" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>
+                Back to Tickets
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Ticket Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <% if (error) { %>
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <%= error %>
+                            </div>
+                            <% } %>
+
+                                <form method="POST" action="/tickets/add" onsubmit="return validateForm(this)">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="customer" class="form-label">Customer *</label>
+                                            <select class="form-select" id="customer" name="customer" required
+                                                onchange="loadCustomerInfo()">
+                                                <option value="">Select Customer</option>
+                                                <% customers.forEach(customer=> { %>
+                                                    <option value="<%= customer._id %>" data-name="<%= customer.name %>"
+                                                        data-email="<%= customer.email %>"
+                                                        data-phone="<%= customer.phone %>"
+                                                        <%=formData.customer===customer._id.toString() ? 'selected' : ''
+                                                        %>>
+                                                        <%= customer.name %> - <%= customer.email %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label for="assignedTo" class="form-label">Assign To</label>
+                                            <select class="form-select" id="assignedTo" name="assignedTo">
+                                                <option value="">Select Support Agent</option>
+                                                <% supportAgents.forEach(agent=> { %>
+                                                    <option value="<%= agent._id %>"
+                                                        <%=formData.assignedTo===agent._id.toString() ? 'selected' : ''
+                                                        %>>
+                                                        <%= agent.name %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Customer Info Display -->
+                                    <div id="customerInfo" class="alert alert-info d-none mb-3">
+                                        <h6><i class="fas fa-user me-2"></i>Customer Information</h6>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <strong>Name:</strong> <span id="customerName"></span>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <strong>Email:</strong> <span id="customerEmail"></span>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <strong>Phone:</strong> <span id="customerPhone"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="title" class="form-label">Ticket Title *</label>
+                                        <input type="text" class="form-control" id="title" name="title"
+                                            value="<%= formData.title || '' %>" required
+                                            placeholder="Brief description of the issue">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Description *</label>
+                                        <textarea class="form-control" id="description" name="description" rows="4"
+                                            placeholder="Detailed description of the issue"
+                                            required><%= formData.description || '' %></textarea>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="status" class="form-label">Status</label>
+                                        <select class="form-select" id="status" name="status">
+                                            <option value="open" <%=formData.status==='open' ? 'selected' : '' %>>Open
+                                            </option>
+                                            <option value="in-progress" <%=formData.status==='in-progress' ? 'selected'
+                                                : '' %>
+                                                >In Progress</option>
+                                            <option value="resolved" <%=formData.status==='resolved' ? 'selected' : ''
+                                                %>
+                                                >Resolved</option>
+                                            <option value="closed" <%=formData.status==='closed' ? 'selected' : '' %>
+                                                >Closed
+                                            </option>
+                                            <option value="cancelled" <%=formData.status==='cancelled' ? 'selected' : ''
+                                                %>
+                                                >Cancelled</option>
+                                        </select>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="issueType" class="form-label">Issue Type *</label>
+                                            <select class="form-select" id="issueType" name="issueType" required>
+                                                <option value="">Select Issue Type</option>
+                                                <option value="technical" <%=formData.issueType==='technical'
+                                                    ? 'selected' : '' %>>Technical Issue</option>
+                                                <option value="billing" <%=formData.issueType==='billing' ? 'selected'
+                                                    : '' %>
+                                                    >Billing Issue</option>
+                                                <option value="product" <%=formData.issueType==='product' ? 'selected'
+                                                    : '' %>
+                                                    >Product Issue</option>
+                                                <option value="service" <%=formData.issueType==='service' ? 'selected'
+                                                    : '' %>
+                                                    >Service Request</option>
+                                                <option value="complaint" <%=formData.issueType==='complaint'
+                                                    ? 'selected' : '' %>>Complaint</option>
+                                                <option value="request" <%=formData.issueType==='request' ? 'selected'
+                                                    : '' %>
+                                                    >General Request</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label for="priority" class="form-label">Priority *</label>
+                                            <select class="form-select" id="priority" name="priority" required>
+                                                <option value="medium" <%=formData.priority==='medium' ? 'selected' : ''
+                                                    %>
+                                                    >Medium</option>
+                                                <option value="low" <%=formData.priority==='low' ? 'selected' : '' %>
+                                                    >Low
+                                                </option>
+                                                <option value="high" <%=formData.priority==='high' ? 'selected' : '' %>
+                                                    >High
+                                                </option>
+                                                <option value="urgent" <%=formData.priority==='urgent' ? 'selected' : ''
+                                                    %>
+                                                    >Urgent</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="tags" class="form-label">Tags</label>
+                                        <input type="text" class="form-control" id="tags" name="tags"
+                                            value="<%= formData.tags || '' %>"
+                                            placeholder="Enter tags separated by commas (e.g., urgent, billing, refund)">
+                                        <small class="form-text text-muted">Tags help in categorizing and searching
+                                            tickets</small>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="/tickets" class="btn btn-outline-secondary">
+                                            <i class="fas fa-times me-1"></i>
+                                            Cancel
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-1"></i>
+                                            Create Ticket
+                                        </button>
+                                    </div>
+                                </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <script>
+            function loadCustomerInfo() {
+                const customerSelect = document.getElementById('customer');
+                const selectedOption = customerSelect.options[customerSelect.selectedIndex];
+                const customerInfo = document.getElementById('customerInfo');
+
+                if (selectedOption.value) {
+                    document.getElementById('customerName').textContent = selectedOption.dataset.name;
+                    document.getElementById('customerEmail').textContent = selectedOption.dataset.email;
+                    document.getElementById('customerPhone').textContent = selectedOption.dataset.phone;
+                    customerInfo.classList.remove('d-none');
+                } else {
+                    customerInfo.classList.add('d-none');
+                }
+            }
+
+            function validateForm(form) {
+                const requiredFields = form.querySelectorAll('[required]');
+                let isValid = true;
+
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+
+                if (!isValid) {
+                    alert('Please fill in all required fields.');
+                }
+
+                return isValid;
+            }
+
+            // Auto-assign based on issue type
+            document.getElementById('issueType').addEventListener('change', function () {
+                const assignedTo = document.getElementById('assignedTo');
+                const issueType = this.value;
+
+                // Auto-suggest priority based on issue type
+                const priority = document.getElementById('priority');
+
+                switch (issueType) {
+                    case 'technical':
+                        priority.value = 'high';
+                        break;
+                    case 'billing':
+                        priority.value = 'medium';
+                        break;
+                    case 'complaint':
+                        priority.value = 'high';
+                        break;
+                    case 'urgent':
+                        priority.value = 'urgent';
+                        break;
+                    default:
+                        priority.value = 'medium';
+                }
+            });
+
+            // Load customer info if pre-selected
+            document.addEventListener('DOMContentLoaded', function () {
+                const customerSelect = document.getElementById('customer');
+                if (customerSelect.value) {
+                    loadCustomerInfo();
+                }
+            });
+        </script>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,282 @@
+<% layout('../layout') -%>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">
+        <i class="fas fa-user-cog text-primary me-2"></i>
+        User Management
+    </h4>
+    <a href="/users/add" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i>
+        Add New User
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Search</label>
+                <input type="text" class="form-control" name="search" value="<%= query.search || '' %>" 
+                       placeholder="Name or email">
+            </div>
+            
+            <div class="col-md-3">
+                <label class="form-label">Role</label>
+                <select class="form-select" name="role">
+                    <option value="">All Roles</option>
+                    <option value="admin" <%= query.role === 'admin' ? 'selected' : '' %>>Administrator</option>
+                    <option value="sales" <%= query.role === 'sales' ? 'selected' : '' %>>Sales Executive</option>
+                    <option value="telecaller" <%= query.role === 'telecaller' ? 'selected' : '' %>>Telecaller</option>
+                    <option value="support" <%= query.role === 'support' ? 'selected' : '' %>>Support Agent</option>
+                </select>
+            </div>
+            
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" name="status">
+                    <option value="">All Status</option>
+                    <option value="active" <%= query.status === 'active' ? 'selected' : '' %>>Active</option>
+                    <option value="inactive" <%= query.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+                </select>
+            </div>
+            
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <a href="/users" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Users Table -->
+<div class="card">
+    <div class="card-body">
+        <% if (users.length > 0) { %>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>User Details</th>
+                        <th>Contact</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Last Login</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(u => { %>
+                    <tr class="<%= !u.isActive ? 'table-secondary' : '' %>">
+                        <td>
+                            <div>
+                                <strong><%= u.name %></strong>
+                                <small class="d-block text-muted">
+                                    <i class="fas fa-envelope me-1"></i><%= u.email %>
+                                </small>
+                            </div>
+                        </td>
+                        <td>
+                            <% if (u.phone) { %>
+                            <small>
+                                <i class="fas fa-phone me-1"></i>
+                                <a href="tel:<%= u.phone %>"><%= u.phone %></a>
+                            </small>
+                            <% } else { %>
+                            <span class="text-muted">-</span>
+                            <% } %>
+                        </td>
+                        <td>
+                            <span class="badge bg-<%= 
+                                u.role === 'admin' ? 'danger' : 
+                                u.role === 'sales' ? 'success' : 
+                                u.role === 'telecaller' ? 'info' : 'warning' 
+                            %>">
+                                <%= u.getRoleDisplay() %>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-<%= u.isActive ? 'success' : 'secondary' %>">
+                                <%= u.isActive ? 'Active' : 'Inactive' %>
+                            </span>
+                        </td>
+                        <td>
+                            <% if (u.lastLogin) { %>
+                            <small class="text-muted">
+                                <%= moment(u.lastLogin).format('MMM DD, YYYY') %>
+                                <span class="d-block">
+                                    <%= moment(u.lastLogin).fromNow() %>
+                                </span>
+                            </small>
+                            <% } else { %>
+                            <span class="text-muted">Never</span>
+                            <% } %>
+                        </td>
+                        <td>
+                            <small class="text-muted">
+                                <%= moment(u.createdAt).format('MMM DD, YYYY') %>
+                                <% if (u.createdBy) { %>
+                                <span class="d-block">
+                                    by <%= u.createdBy.name %>
+                                </span>
+                                <% } %>
+                            </small>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="/users/edit/<%= u._id %>" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                
+                                <% if (u._id.toString() !== user._id) { %>
+                                <!-- <button class="btn btn-sm btn-<%= u.isActive ? 'outline-danger' : 'outline-success' %>" 
+                                        onclick="toggleUserStatus('<%= u._id %>', <%= u.isActive %>)" 
+                                        title="<%= u.isActive ? 'Deactivate' : 'Activate' %>">
+                                    <i class="fas fa-<%= u.isActive ? 'ban' : 'check' %>"></i>
+                                </button> -->
+                                <% } %>
+                            </div>
+                        </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+        <nav aria-label="Users pagination" class="mt-4">
+            <ul class="pagination">
+                <% if (currentPage > 1) { %>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<%= currentPage - 1 %>&<%= new URLSearchParams(query).toString() %>">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                <% } %>
+                
+                <% for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
+                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                    <a class="page-link" href="?page=<%= i %>&<%= new URLSearchParams(query).toString() %>">
+                        <%= i %>
+                    </a>
+                </li>
+                <% } %>
+                
+                <% if (currentPage < totalPages) { %>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<%= currentPage + 1 %>&<%= new URLSearchParams(query).toString() %>">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                <% } %>
+            </ul>
+        </nav>
+        <% } %>
+        
+        <% } else { %>
+        <div class="text-center py-5">
+            <i class="fas fa-user-cog text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
+            <h5 class="mt-3 text-muted">No Users Found</h5>
+            <p class="text-muted">Start by adding team members to the system</p>
+            <a href="/users/add" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>
+                Add First User
+            </a>
+        </div>
+        <% } %>
+    </div>
+</div>
+
+<!-- User Statistics -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="d-flex align-items-center">
+                <div class="stats-icon bg-danger me-3">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div>
+                    <h4 class="mb-0"><%= users.filter(u => u.role === 'admin').length %></h4>
+                    <p class="text-muted mb-0">Administrators</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="d-flex align-items-center">
+                <div class="stats-icon bg-success me-3">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div>
+                    <h4 class="mb-0"><%= users.filter(u => u.role === 'sales').length %></h4>
+                    <p class="text-muted mb-0">Sales Executives</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="d-flex align-items-center">
+                <div class="stats-icon bg-info me-3">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <div>
+                    <h4 class="mb-0"><%= users.filter(u => u.role === 'telecaller').length %></h4>
+                    <p class="text-muted mb-0">Telecallers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="d-flex align-items-center">
+                <div class="stats-icon bg-warning me-3">
+                    <i class="fas fa-life-ring"></i>
+                </div>
+                <div>
+                    <h4 class="mb-0"><%= users.filter(u => u.role === 'support').length %></h4>
+                    <p class="text-muted mb-0">Support Agents</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleUserStatus(userId, currentStatus) {
+    const action = currentStatus ? 'deactivate' : 'activate';
+    if (confirm(`Are you sure you want to ${action} this user?`)) {
+        fetch(`/users/toggle-status/${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('An error occurred while updating user status');
+            console.error('Error:', error);
+        });
+    }
+}
+</script>

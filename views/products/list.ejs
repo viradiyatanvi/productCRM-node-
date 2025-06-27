@@ -1,0 +1,137 @@
+<%- include('../layout') %>
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div class="main-content">
+      <div class="container mt-4">
+        <h2>Products List</h2>
+
+        <% if (query.success) { %>
+          <div class="alert alert-success">
+            <%= query.success %>
+          </div>
+          <% } %>
+            <% if (query.error) { %>
+              <div class="alert alert-danger">
+                <%= query.error %>
+              </div>
+              <% } %>
+
+                <form method="GET" class="mb-3 d-flex gap-2 flex-wrap">
+                  <input type="text" name="search" placeholder="Search by name or SKU" class="form-control"
+                    value="<%= query.search || '' %>" />
+                  <select name="category" class="form-control">
+                    <option value="">All Categories</option>
+                    <% categories.forEach(cat=> { %>
+                      <option value="<%= cat %>" <%=query.category===cat ? 'selected' : '' %>><%= cat %>
+                      </option>
+                      <% }) %>
+                  </select>
+                  <select name="status" class="form-control">
+                    <option value="">All Status</option>
+                    <option value="active" <%=query.status==='active' ? 'selected' : '' %>>Active</option>
+                    <option value="inactive" <%=query.status==='inactive' ? 'selected' : '' %>>Inactive</option>
+                  </select>
+                  <button class="btn btn-primary">Filter</button>
+                  <a href="/products" class="btn btn-secondary">Reset</a>
+                </form>
+
+                <a href="/products/add" class="btn btn-success mb-3">+ Add New Product</a>
+
+                <div class="table-responsive">
+                  <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>#</th>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price (₹)</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>SKU</th>
+                        <th>Created By</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% if (products.length===0) { %>
+                        <tr>
+                          <td colspan="10" class="text-center">No products found</td>
+                        </tr>
+                        <% } %>
+                          <% products.forEach((product, index)=> { %>
+                            <tr>
+                              <td>
+                                <%= (currentPage - 1) * 10 + index + 1 %>
+                              </td>
+                              <td>
+                                <% if (product.images.length> 0) { %>
+                                  <img src="<%= product.images[0] %>" width="60" height="60"
+                                    style="object-fit:cover;" />
+                                  <% } else { %>
+                                    N/A
+                                    <% } %>
+                              </td>
+                              <td>
+                                <%= product.name %>
+                              </td>
+                              <td>
+                                <%= product.category %>
+                              </td>
+                              <td>
+                                <%= product.price %>
+                              </td>
+                              <td>
+                                <%= product.stockQuantity %> (<%= product.stockStatus %>)
+                              </td>
+                              <td>
+                                <span class="badge <%= product.status === 'active' ? 'bg-success' : 'bg-secondary' %>">
+                                  <%= product.status %>
+                                </span>
+                              </td>
+                              <td>
+                                <%= product.sku %>
+                              </td>
+                              <td>
+                                <%= product.createdBy?.name || 'N/A' %>
+                              </td>
+                              <td>
+                                <a href="/products/<%= product._id %>" class="btn btn-sm btn-info">View</a>
+                                <a href="/products/edit/<%= product._id %>" class="btn btn-sm btn-warning">Edit</a>
+                                <form action="/products/delete/<%= product._id %>" method="POST" style="display:inline;"
+                                  onsubmit="return confirm('Are you sure?')">
+                                  <button class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                              </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <% if (totalPages> 1) { %>
+                  <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                      <% for (let i=1; i <=totalPages; i++) { %>
+                        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                          <a class="page-link"
+                            href="?<%= Object.entries(query).map(([k,v]) => k==='page' ? '' : `${k}=${v}`).join('&') %>&page=<%= i %>">
+                            <%= i %>
+                          </a>
+                        </li>
+                        <% } %>
+                    </ul>
+                  </nav>
+                  <% } %>
+
+      </div>
+    </div>
+  </body>
+
+  </html>

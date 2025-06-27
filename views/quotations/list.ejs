@@ -1,0 +1,139 @@
+<%- include('../layout') %>
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  </head>
+
+  <body>
+    <div class="main-content">
+      <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4><i class="fas fa-file-invoice text-primary me-2"></i> Quotations</h4>
+          <% if (user.role==='admin' || user.role==='sales' ) { %>
+            <a href="/quotations/add" class="btn btn-primary"><i class="fas fa-plus me-1"></i> Create Quotation</a>
+            <% } %>
+        </div>
+
+        <!-- Quotations Table -->
+        <div class="card">
+          <div class="card-body">
+            <% if (quotations.length> 0) { %>
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Customer</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Valid Until</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% quotations.forEach((quotation, index)=> { %>
+                      <tr>
+                        <td>
+                          <%= quotation.quotationNumber %>
+                        </td>
+                        <td>
+                          <%= quotation.customer?.name || 'N/A' %>
+                        </td>
+                        <td>
+                          ₹<%= quotation.finalAmount.toLocaleString() %>
+                            <% if (quotation.discount> 0) { %>
+                              <div class="text-muted small">Discount: ₹<%= quotation.discount %>
+                              </div>
+                              <% } %>
+                        </td>
+                        <td>
+                          <span
+                            class="badge bg-<%= quotation.status === 'draft' ? 'secondary' : quotation.status === 'sent' ? 'info' : quotation.status === 'accepted' ? 'success' : quotation.status === 'rejected' ? 'danger' : quotation.status === 'expired' ? 'warning' : 'primary' %>">
+                            <%= quotation.status.charAt(0).toUpperCase() + quotation.status.slice(1) %>
+                          </span>
+                        </td>
+                        <td>
+                          <%= moment(quotation.validUntil).format('MMM DD, YYYY') %>
+                            <% if (new Date(quotation.validUntil) < new Date() && quotation.status !=='converted' ) { %>
+                              <div class="text-danger small">Expired</div>
+                              <% } %>
+                        </td>
+                        <td>
+                          <div class="btn-group">
+                            <a href="/quotations/<%= quotation._id %>" class="btn btn-sm btn-outline-primary"><i
+                                class="fas fa-eye"></i></a>
+
+                            <% if (quotation.status==='draft' ) { %>
+                              <button class="btn btn-sm btn-info"
+                                onclick="updateQuotationStatus('<%= quotation._id %>', 'sent')"><i
+                                  class="fas fa-paper-plane"></i></button>
+                              <% } %>
+
+                                <% if (quotation.status==='sent' ) { %>
+                                  <button class="btn btn-sm btn-success"
+                                    onclick="updateQuotationStatus('<%= quotation._id %>', 'accepted')"><i
+                                      class="fas fa-check"></i></button>
+                                  <button class="btn btn-sm btn-danger"
+                                    onclick="updateQuotationStatus('<%= quotation._id %>', 'rejected')"><i
+                                      class="fas fa-times"></i></button>
+                                  <% } %>
+
+                                    <% if (quotation.status==='accepted' ) { %>
+                                      <button class="btn btn-sm btn-warning"
+                                        onclick="convertQuotation('<%= quotation._id %>')"><i
+                                          class="fas fa-exchange-alt"></i></button>
+                                      <% } %>
+                          </div>
+                        </td>
+                      </tr>
+                      <% }) %>
+                  </tbody>
+                </table>
+              </div>
+              <% } else { %>
+                <div class="text-center">No quotations found.</div>
+                <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function updateQuotationStatus(id, status) {
+        if (confirm(`Mark quotation as ${status}?`)) {
+          fetch(`/quotations/update-status/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+          }).then(res => res.json()).then(data => {
+            if (data.success) location.reload();
+            else alert(data.message || 'Error updating status');
+          });
+        }
+      }
+
+      function convertQuotation(id) {
+        if (confirm('Convert this quotation to sale?')) {
+          fetch(`/quotations/convert/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          }).then(res => res.json()).then(data => {
+            if (data.success) {
+              alert('Converted successfully!');
+              location.reload();
+            } else alert(data.message || 'Error');
+          });
+        }
+      }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+  </body>
+
+  </html>

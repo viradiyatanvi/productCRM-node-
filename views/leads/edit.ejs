@@ -1,0 +1,180 @@
+<%- include('../layout') %>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+
+    <body>
+        <div class="main-content mt-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">
+                    <i class="fas fa-edit text-warning me-2"></i>
+                    Edit Lead
+                </h4>
+                <a href="/leads" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Back to Leads
+                </a>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Update Lead Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <% if (error) { %>
+                                <div class="alert alert-danger">
+                                    <%= error %>
+                                </div>
+                                <% } %>
+
+                                    <form method="POST" action="/leads/edit/<%= lead._id %>">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label>Full Name *</label>
+                                                <input type="text" name="name" class="form-control"
+                                                    value="<%= lead.name %>" required />
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label>Email *</label>
+                                                <input type="email" name="email" class="form-control"
+                                                    value="<%= lead.email %>" required />
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label>Phone *</label>
+                                                <input type="text" name="phone" class="form-control"
+                                                    value="<%= lead.phone %>" required />
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label>City</label>
+                                                <input type="text" name="city" class="form-control"
+                                                    value="<%= lead.city || '' %>" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label>Interested Product</label>
+                                                <select name="interestedProduct" class="form-select">
+                                                    <option value="">Select Product</option>
+                                                    <% products.forEach(product=> { %>
+                                                        <option value="<%= product._id %>" <%=lead.interestedProduct &&
+                                                            lead.interestedProduct.toString()===product._id.toString()
+                                                            ? 'selected' : '' %>>
+                                                            <%= product.name %>
+                                                        </option>
+
+                                                        <% }) %>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label>Source</label>
+                                                <select name="source" class="form-select">
+                                                    <option value="manual" <%=lead.source==='manual' ? 'selected' : ''
+                                                        %>>Manual
+                                                    </option>
+                                                    <option value="web" <%=lead.source==='web' ? 'selected' : '' %>
+                                                        >Website</option>
+                                                    <option value="excel" <%=lead.source==='excel' ? 'selected' : '' %>
+                                                        >Excel Import
+                                                    </option>
+                                                    <option value="referral" <%=lead.source==='referral' ? 'selected'
+                                                        : '' %>
+                                                        >Referral</option>
+                                                    <option value="social-media" <%=lead.source==='social-media'
+                                                        ? 'selected' : '' %>>Social Media</option>
+                                                    <option value="advertisement" <%=lead.source==='advertisement'
+                                                        ? 'selected' : '' %>>Advertisement</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label>Priority</label>
+                                                <select name="priority" class="form-select">
+                                                    <option value="low" <%=lead.priority==='low' ? 'selected' : '' %>
+                                                        >Low</option>
+                                                    <option value="medium" <%=lead.priority==='medium' ? 'selected' : ''
+                                                        %>>Medium
+                                                    </option>
+                                                    <option value="high" <%=lead.priority==='high' ? 'selected' : '' %>
+                                                        >High
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label>Status</label>
+                                                    <select name="status" class="form-select" required>
+                                                        <option value="new" <%=lead.status==='new' ? 'selected' : '' %>
+                                                            >New</option>
+                                                        <option value="contacted" <%=lead.status==='contacted'
+                                                            ? 'selected' : '' %>
+                                                            >Contacted</option>
+                                                        <option value="interested" <%=lead.status==='interested'
+                                                            ? 'selected' : '' %>>Interested</option>
+                                                        <option value="not-interested" <%=lead.status==='not-interested'
+                                                            ? 'selected' : '' %>>Not Interested</option>
+                                                        <option value="converted" <%=lead.status==='converted'
+                                                            ? 'selected' : '' %>
+                                                            >Converted</option>
+                                                        <option value="lost" <%=lead.status==='lost' ? 'selected' : ''
+                                                            %>>Lost
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+
+                                            <% if (user.role==='admin' || user.role==='sales' ) { %>
+                                                <div class="col-md-6 mb-3">
+                                                    <label>Assign To</label>
+                                                    <select name="assignedTo" class="form-select">
+                                                        <option value="">Select User</option>
+                                                        <% users.forEach(u=> { %>
+                                                            <option value="<%= u._id %>" <%=lead.assignedTo &&
+                                                                lead.assignedTo.toString()===u._id.toString()
+                                                                ? 'selected' : '' %>>
+                                                                <%= u.name %> (<%= u.role %>)
+                                                            </option>
+
+                                                            <% }) %>
+                                                    </select>
+                                                </div>
+                                                <% } %>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label>Notes</label>
+                                            <textarea name="notes" class="form-control"
+                                                rows="3"><%= lead.notes || '' %></textarea>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a href="/leads" class="btn btn-outline-secondary">
+                                                <i class="fas fa-times me-1"></i> Cancel
+                                            </a>
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-check me-1"></i> Update Lead
+                                            </button>
+                                        </div>
+                                    </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    </html>

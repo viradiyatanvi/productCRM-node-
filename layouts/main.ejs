@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body>
+    <% if (user) { %>
+        <%- include('../partials/sidebar') %>
+    <% } %>
+
+    <div class="<%= user ? 'main-content' : '' %>">
+        <% if (user) { %>
+            <%- include('../partials/topbar') %>
+        <% } %>
+
+        <div class="<%= user ? 'content-area' : 'container-fluid' %>">
+            <%- include('../partials/messages') %>
+            <%- body %> 
+        </div>
+    </div>
+</body>
+</html>

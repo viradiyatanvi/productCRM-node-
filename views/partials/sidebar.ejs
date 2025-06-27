@@ -1,0 +1,31 @@
+<!-- partials/sidebar.ejs -->
+<nav class="sidebar">
+    <div class="brand">
+        <h4><i class="fas fa-chart-line me-2"></i>Product CRM</h4>
+        <small class="text-light">Welcome, <%= user.name %></small>
+    </div>
+    
+    <div class="nav flex-column">
+        <a class="nav-link" href="/"> <i class="fas fa-tachometer-alt"></i> Dashboard </a>
+        <a class="nav-link" href="/leads"> <i class="fas fa-user-plus"></i> Leads </a>
+        <a class="nav-link" href="/followup"> <i class="fas fa-phone"></i> Follow-ups </a>
+        <a class="nav-link" href="/customers"> <i class="fas fa-users"></i> Customers </a>
+
+        <% if (user.role === 'admin' || user.role === 'sales') { %>
+        <a class="nav-link" href="/products"> <i class="fas fa-box"></i> Products </a>
+        <a class="nav-link" href="/sales"> <i class="fas fa-dollar-sign"></i> Sales </a>
+        <% } %>
+
+        <a class="nav-link" href="/tickets"> <i class="fas fa-ticket-alt"></i> Support Tickets </a>
+
+        <% if (user.role === 'admin') { %>
+        <a class="nav-link" href="/users"> <i class="fas fa-user-cog"></i> User Management </a>
+        <a class="nav-link" href="/reports"> <i class="fas fa-chart-bar"></i> Reports </a>
+        <% } %>
+
+        <div class="mt-auto">
+            <a class="nav-link" href="/auth/change-password"> <i class="fas fa-key"></i> Change Password </a>
+            <a class="nav-link" href="/auth/logout"> <i class="fas fa-sign-out-alt"></i> Logout </a>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,292 @@
+<%- include('../layout') %>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="main-content mt-5">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">
+                <i class="fas fa-file-invoice text-primary me-2"></i>
+                Invoice: <%= sale.invoiceNumber %>
+            </h4>
+            <div>
+                <button onclick="window.print()" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-print me-1"></i>
+                    Print Invoice
+                </button>
+                <a href="/sales" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Back to Sales
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <!-- Invoice Header -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h3 class="text-primary mb-3">
+                            <i class="fas fa-building me-2"></i>
+                            Your Company Name
+                        </h3>
+                        <p class="mb-1">123 Business Street</p>
+                        <p class="mb-1">City, State 12345</p>
+                        <p class="mb-1">Phone: +91-1234567890</p>
+                        <p class="mb-1">Email: info@company.com</p>
+                        <p class="mb-1">GST: 12ABCDE3456F7GH</p>
+                    </div>
+
+                    <div class="col-md-6 text-end">
+                        <h2 class="text-dark mb-3">INVOICE</h2>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td class="text-end"><strong>Invoice Number:</strong></td>
+                                <td>
+                                    <%= sale.invoiceNumber %>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-end"><strong>Date:</strong></td>
+                                <td>
+                                    <%= moment(sale.saleDate).format('MMMM DD, YYYY') %>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-end"><strong>Payment Status:</strong></td>
+                                <td>
+                                    <span class="badge bg-<%= 
+                                sale.paymentStatus === 'paid' ? 'success' : 
+                                sale.paymentStatus === 'partial' ? 'warning' : 
+                                sale.paymentStatus === 'refunded' ? 'danger' : 'secondary' 
+                            %>">
+                                        <%= sale.paymentStatus.charAt(0).toUpperCase() + sale.paymentStatus.slice(1) %>
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Customer Information -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5 class="text-primary mb-3">Bill To:</h5>
+                        <div class="border p-3 rounded">
+                            <h6 class="mb-2">
+                                <%= sale.customer.name %>
+                            </h6>
+                            <p class="mb-1">
+                                <i class="fas fa-envelope me-2"></i>
+                                <%= sale.customer.email %>
+                            </p>
+                            <p class="mb-1">
+                                <i class="fas fa-phone me-2"></i>
+                                <%= sale.customer.phone %>
+                            </p>
+                            <% if (sale.customer.address && sale.customer.address.street) { %>
+                                <p class="mb-1">
+                                    <i class="fas fa-map-marker-alt me-2"></i>
+                                    <%= sale.customer.address.street %><br>
+                                        <%= sale.customer.address.city %>, <%= sale.customer.address.state %>
+                                                <%= sale.customer.address.zipCode %>
+                                </p>
+                                <% } %>
+                                    <% if (sale.customer.gst) { %>
+                                        <p class="mb-0">
+                                            <strong>GST:</strong>
+                                            <%= sale.customer.gst %>
+                                        </p>
+                                        <% } %>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h5 class="text-primary mb-3">Sales Person:</h5>
+                        <div class="border p-3 rounded">
+                            <h6 class="mb-2">
+                                <%= sale.salesPerson.name %>
+                            </h6>
+                            <p class="mb-1">
+                                <i class="fas fa-envelope me-2"></i>
+                                <%= sale.salesPerson.email %>
+                            </p>
+                            <p class="mb-0">
+                                <i class="fas fa-user-tag me-2"></i>
+                                Sales Executive
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Table -->
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>#</th>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th class="text-end">Unit Price</th>
+                                <th class="text-center">Quantity</th>
+                                <th class="text-end">Discount</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% sale.products.forEach((item, index)=> { %>
+                                <tr>
+                                    <td>
+                                        <%= index + 1 %>
+                                    </td>
+                                    <td>
+                                        <strong>
+                                            <%= item.product.name %>
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        <%= item.product.category %>
+                                    </td>
+                                    <td class="text-end">₹<%= item.price.toLocaleString() %>
+                                    </td>
+                                    <td class="text-center">
+                                        <%= item.quantity %>
+                                    </td>
+                                    <td class="text-end">₹<%= item.discount.toLocaleString() %>
+                                    </td>
+                                    <td class="text-end">₹<%= ((item.quantity * item.price) -
+                                            item.discount).toLocaleString() %>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Totals Section -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <% if (sale.notes) { %>
+                            <h6 class="text-primary">Notes:</h6>
+                            <p class="text-muted">
+                                <%= sale.notes %>
+                            </p>
+                            <% } %>
+
+                                <h6 class="text-primary mt-3">Payment Information:</h6>
+                                <p class="mb-1"><strong>Method:</strong>
+                                    <%= sale.paymentMethod.charAt(0).toUpperCase() +
+                                        sale.paymentMethod.slice(1).replace('-', ' ' ) %>
+                                </p>
+                                <p class="mb-1"><strong>Status:</strong>
+                                    <span class="badge bg-<%= 
+                        sale.paymentStatus === 'paid' ? 'success' : 
+                        sale.paymentStatus === 'partial' ? 'warning' : 
+                        sale.paymentStatus === 'refunded' ? 'danger' : 'secondary' 
+                    %>">
+                                        <%= sale.paymentStatus.charAt(0).toUpperCase() + sale.paymentStatus.slice(1) %>
+                                    </span>
+                                </p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td><strong>Subtotal:</strong></td>
+                                        <td class="text-end">₹<%= sale.totalAmount.toLocaleString() %>
+                                        </td>
+                                    </tr>
+                                    <% if (sale.discount> 0) { %>
+                                        <tr>
+                                            <td><strong>Discount:</strong></td>
+                                            <td class="text-end text-danger">-₹<%= sale.discount.toLocaleString() %>
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                                            <% if (sale.tax> 0) { %>
+                                                <tr>
+                                                    <td><strong>Tax (GST):</strong></td>
+                                                    <td class="text-end">₹<%= sale.tax.toLocaleString() %>
+                                                    </td>
+                                                </tr>
+                                                <% } %>
+                                                    <tr class="border-top">
+                                                        <td>
+                                                            <h5><strong>Total Amount:</strong></h5>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <h5 class="text-success"><strong>₹<%=
+                                                                        sale.finalAmount.toLocaleString() %></strong>
+                                                            </h5>
+                                                        </td>
+                                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="row mt-5">
+                    <div class="col-12">
+                        <hr>
+                        <div class="text-center text-muted">
+                            <p class="mb-1">Thank you for your business!</p>
+                            <p class="mb-0">For any queries, please contact us at info@company.com or +91-1234567890</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Print Styles -->
+        <style>
+            @media print {
+
+                .btn,
+                .card-header,
+                nav,
+                .sidebar {
+                    display: none !important;
+                }
+
+                .main-content {
+                    margin-left: 0 !important;
+                }
+
+                .content-area {
+                    padding: 0 !important;
+                }
+
+                .card {
+                    border: none !important;
+                    box-shadow: none !important;
+                }
+
+                body {
+                    background: white !important;
+                }
+
+                .table-bordered {
+                    border: 1px solid #000 !important;
+                }
+
+                .table-bordered th,
+                .table-bordered td {
+                    border: 1px solid #000 !important;
+                }
+            }
+        </style>
+    </div>
+</body>
+
+</html>

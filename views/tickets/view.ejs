@@ -1,0 +1,384 @@
+<%- include('../layout') %>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- Bootstrap StyleCss -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -22px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    .timeline-content {
+        background: #f8f9fa;
+        padding: 10px 15px;
+        border-radius: 8px;
+        border-left: 3px solid #dee2e6;
+    }
+</style>
+
+<body>
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">
+                <i class="fas fa-ticket-alt text-primary me-2"></i>
+                Ticket: <%= ticket.ticketNumber %>
+            </h4>
+            <div>
+                <% if (ticket.status !== 'closed' && ticket.status !== 'resolved' && (user.role === 'admin' || user.role === 'support' || (ticket.assignedTo && ticket.assignedTo._id.toString() === user._id))) { %>
+                    <div class="btn-group me-2">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-cog me-1"></i> Actions
+                        </button>
+                        <ul class="dropdown-menu">
+                            <% if (ticket.status === 'open') { %>
+                                <li><a class="dropdown-item" href="#" onclick="updateTicketStatus('in-progress')">
+                                    <i class="fas fa-play me-2"></i>Start Progress
+                                </a></li>
+                            <% } %>
+                            <% if (ticket.status === 'in-progress') { %>
+                                <li><a class="dropdown-item" href="#" onclick="updateTicketStatus('resolved')">
+                                    <i class="fas fa-check me-2"></i>Mark Resolved
+                                </a></li>
+                            <% } %>
+                            <% if (ticket.status === 'resolved') { %>
+                                <li><a class="dropdown-item" href="#" onclick="updateTicketStatus('closed')">
+                                    <i class="fas fa-lock me-2"></i>Close Ticket
+                                </a></li>
+                            <% } %>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="updateTicketStatus('cancelled')">
+                                <i class="fas fa-ban me-2"></i>Cancel
+                            </a></li>
+                        </ul>
+                    </div>
+                <% } %>
+
+                <a href="/tickets" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Back to Tickets
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Ticket Details -->
+            <div class="col-lg-8 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Ticket Details</h5>
+                            <div>
+                                <span class="badge bg-<%= 
+                                    ticket.priority === 'urgent' ? 'danger' : 
+                                    ticket.priority === 'high' ? 'warning' : 
+                                    ticket.priority === 'medium' ? 'info' : 'secondary' 
+                                %> me-2">
+                                    <%= ticket.getPriorityDisplay() %>
+                                </span>
+                                <span class="badge bg-<%= 
+                                    ticket.status === 'open' ? 'danger' : 
+                                    ticket.status === 'in-progress' ? 'warning' : 
+                                    ticket.status === 'resolved' ? 'success' : 
+                                    ticket.status === 'closed' ? 'secondary' : 'dark' 
+                                %>">
+                                    <%= ticket.getStatusDisplay() %>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h6 class="text-primary">Title</h6>
+                            <h5><%= ticket.title %></h5>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6 class="text-primary">Description</h6>
+                            <p class="text-muted"><%= ticket.description %></p>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Issue Type</h6>
+                                <span class="badge bg-<%= 
+                                    ticket.issueType === 'technical' ? 'primary' : 
+                                    ticket.issueType === 'billing' ? 'success' : 
+                                    ticket.issueType === 'product' ? 'warning' : 
+                                    ticket.issueType === 'complaint' ? 'danger' : 'info' 
+                                %>">
+                                    <%= ticket.issueType.charAt(0).toUpperCase() + ticket.issueType.slice(1) %>
+                                </span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Created Date</h6>
+                                <p class="mb-0">
+                                    <%= moment(ticket.createdAt).format('MMMM DD, YYYY [at] HH:mm') %>
+                                    <small class="text-muted d-block">
+                                        <%= moment(ticket.createdAt).fromNow() %>
+                                    </small>
+                                </p>
+                            </div>
+                        </div>
+
+                        <% if (ticket.tags && ticket.tags.length > 0) { %>
+                            <div class="mb-4">
+                                <h6 class="text-primary">Tags</h6>
+                                <% ticket.tags.forEach(tag => { %>
+                                    <span class="badge bg-light text-dark me-1">
+                                        <%= tag %>
+                                    </span>
+                                <% }) %>
+                            </div>
+                        <% } %>
+
+                        <% if (ticket.resolution) { %>
+                            <div class="alert alert-success">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    Resolution
+                                </h6>
+                                <p class="mb-0"><%= ticket.resolution %></p>
+                                <hr>
+                                <small class="mb-0">
+                                    Resolved by <%= ticket.resolvedBy.name %> on
+                                    <%= moment(ticket.resolvedAt).format('MMMM DD, YYYY [at] HH:mm') %>
+                                </small>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Information -->
+            <div class="col-lg-4 mb-4">
+                <!-- Customer Information -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-user text-info me-2"></i>
+                            Customer Information
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Name</label>
+                            <p class="mb-0"><strong><%= ticket.customer.name %></strong></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Email</label>
+                            <p class="mb-0">
+                                <a href="mailto:<%= ticket.customer.email %>">
+                                    <i class="fas fa-envelope me-1"></i>
+                                    <%= ticket.customer.email %>
+                                </a>
+                            </p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Phone</label>
+                            <p class="mb-0">
+                                <a href="tel:<%= ticket.customer.phone %>" class="btn btn-sm btn-success">
+                                    <i class="fas fa-phone me-1"></i>
+                                    <%= ticket.customer.phone %>
+                                </a>
+                            </p>
+                        </div>
+
+                        <div class="d-grid">
+                            <a href="/customers/<%= ticket.customer._id %>" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-user me-1"></i>
+                                View Customer Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assignment Information -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-user-cog text-warning me-2"></i>
+                            Assignment
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Created By</label>
+                            <p class="mb-0">
+                                <span class="badge bg-light text-dark">
+                                    <%= ticket.createdBy.name %>
+                                </span>
+                            </p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Assigned To</label>
+                            <p class="mb-0">
+                                <% if (ticket.assignedTo) { %>
+                                    <span class="badge bg-primary">
+                                        <%= ticket.assignedTo.name %>
+                                    </span>
+                                    <small class="d-block text-muted">
+                                        <i class="fas fa-envelope me-1"></i>
+                                        <%= ticket.assignedTo.email %>
+                                    </small>
+                                <% } else { %>
+                                    <span class="text-muted">Unassigned</span>
+                                <% } %>
+                            </p>
+                        </div>
+
+                        <% if (ticket.resolvedBy) { %>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Resolved By</label>
+                                <p class="mb-0">
+                                    <span class="badge bg-success">
+                                        <%= ticket.resolvedBy.name %>
+                                    </span>
+                                </p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-clock text-success me-2"></i>
+                            Timeline
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">Ticket Created</h6>
+                                    <small class="text-muted">
+                                        <%= moment(ticket.createdAt).format('MMM DD, YYYY [at] HH:mm') %>
+                                    </small>
+                                    <p class="mb-0 small">by <%= ticket.createdBy.name %></p>
+                                </div>
+                            </div>
+
+                            <% if (ticket.assignedTo) { %>
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-info"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">Assigned</h6>
+                                        <small class="text-muted">
+                                            <%= moment(ticket.createdAt).format('MMM DD, YYYY [at] HH:mm') %>
+                                        </small>
+                                        <p class="mb-0 small">to <%= ticket.assignedTo.name %></p>
+                                    </div>
+                                </div>
+                            <% } %>
+
+                            <% if (ticket.status === 'in-progress') { %>
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-warning"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">In Progress</h6>
+                                        <small class="text-muted">Work started</small>
+                                    </div>
+                                </div>
+                            <% } %>
+
+                            <% if (ticket.resolvedAt) { %>
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-success"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">Resolved</h6>
+                                        <small class="text-muted">
+                                            <%= moment(ticket.resolvedAt).format('MMM DD, YYYY [at] HH:mm') %>
+                                        </small>
+                                        <p class="mb-0 small">by <%= ticket.resolvedBy.name %></p>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateTicketStatus(status) {
+            let confirmMessage = `Are you sure you want to mark this ticket as ${status.replace('-', ' ')}?`;
+            let resolution = null;
+
+            if (status === 'resolved') {
+                resolution = prompt('Please provide resolution details:');
+                if (!resolution) return;
+            }
+
+            if (confirm(confirmMessage)) {
+                const body = { status };
+                if (resolution) body.resolution = resolution;
+
+                fetch(`/tickets/update-status/<%= ticket._id %>`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        } else {
+                            alert('Error updating ticket status');
+                        }
+                    })
+                    .catch(error => {
+                        alert('An error occurred while updating ticket status');
+                        console.error('Error:', error);
+                    });
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+</body>
+
+</html>

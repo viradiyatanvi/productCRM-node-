@@ -1,0 +1,95 @@
+<%- include('../layout') %>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+
+    <body>
+
+        <div class="main-content mt-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-circle text-primary me-2"></i>
+                    Lead Details
+                </h4>
+                <a href="/leads" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Back to Leads
+                </a>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Lead Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <strong>Name:</strong>
+                                <%= lead.name %>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Email:</strong>
+                                <%= lead.email %>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Phone:</strong>
+                                <%= lead.phone %>
+                            </div>
+                            <div class="mb-3">
+                                <strong>City:</strong>
+                                <%= lead.city || 'N/A' %>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Interested Product:</strong>
+                                <%= lead.interestedProduct?.name || 'N/A' %>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Source:</strong>
+                                <%= lead.source ? lead.source.charAt(0).toUpperCase() + lead.source.slice(1) : 'N/A' %>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Priority:</strong>
+                                <span
+                                    class="badge bg-<%= lead.priority === 'high' ? 'danger' : lead.priority === 'medium' ? 'warning text-dark' : 'secondary' %> text-capitalize">
+                                    <%= lead.priority %>
+                                </span>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Assigned To:</strong>
+                                <%= lead.assignedTo ? lead.assignedTo.name + ' (' + lead.assignedTo.role + ')'
+                                    : 'Not Assigned' %>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Notes:</strong>
+                                <p>
+                                    <%= lead.notes || 'No Notes Available' %>
+                                </p>
+                            </div>
+                            <div class="mb-3 text-muted small">
+                                <strong>Created At:</strong>
+                                <%= moment(lead.createdAt).format('DD MMM YYYY, hh:mm A') %> <br />
+                                    <strong>Last Updated:</strong>
+                                    <%= moment(lead.updatedAt).format('DD MMM YYYY, hh:mm A') %>
+                            </div>
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="/leads/edit/<%= lead._id %>" class="btn btn-warning">
+                                    <i class="fas fa-edit me-1"></i> Edit Lead
+                                </a>
+                                <a href="/leads" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i> Close
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    </html>
