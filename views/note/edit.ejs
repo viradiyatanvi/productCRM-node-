@@ -1,0 +1,84 @@
+<%- include('../layout') %>
+
+  <div class="main-content">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h4>Edit Note</h4>
+        <a href="/note" class="btn btn-sm btn-secondary">
+          <i class="fas fa-arrow-left"></i> Back
+        </a>
+      </div>
+      <div class="card-body">
+
+        <form method="POST" action="/note/edit/<%= note._id %>" enctype="multipart/form-data">
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h5>Note Information</h5>
+
+              <div class="mb-3">
+                <label class="form-label">Title *</label>
+                <input type="text" class="form-control" name="title" value="<%= formData.title %>" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Note Type *</label>
+                <select class="form-select" name="noteType" required>
+                  <option value="">Select Note Type</option>
+                  <% noteTypes.forEach(nt=> { %>
+                    <option value="<%= nt._id %>" <%=(formData.noteType &&
+                      formData.noteType.toString()===nt._id.toString()) ? 'selected' : '' %>>
+                      <% if (nt.icon) { %>
+                        <img src="/uploads/noteTypes/<%= nt.icon %>" width="20" class="me-2">
+                        <% } %>
+                          <%= nt.name %>
+                    </option>
+                    <% }) %>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Related To</label>
+              <select class="form-select" name="relatedTo">
+                <option value="">Select Candidate</option>
+                <% candidates.forEach(c=> { %>
+                  <option value="<%= c._id %>" <%=(formData.relatedTo &&
+                    formData.relatedTo.toString()===c._id.toString()) ? 'selected' : '' %>>
+                    <%= c.firstName %>
+                      <%= c.lastName %>
+                  </option>
+                  <% }) %>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <h5>Description Information</h5>
+
+              <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" name="description" rows="5"><%= formData.description %></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Image</label>
+                <input type="file" class="form-control" name="image" accept="image/*">
+                <% if (note.image) { %>
+                  <div class="mt-2">
+                    <small>Current Image:</small>
+                    <img src="/uploads/notes/<%= note.image %>" width="100" class="d-block mt-1">
+                  </div>
+                  <% } %>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end">
+            <button type="submit" class="btn text-white me-2" style="background-color: #343a40;">
+              <i class="fas fa-save me-2"></i>Update Note
+            </button>
+            <a href="/note" class="btn btn-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

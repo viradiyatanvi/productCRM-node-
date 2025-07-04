@@ -1,0 +1,312 @@
+<%- include('../layout') %>
+
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Note Details</title>
+        <style>
+            .note-detail-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .note-detail-card {
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+                border: none;
+                transition: transform 0.3s ease;
+            }
+
+            .note-detail-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .note-detail-header {
+                padding: 1.5rem;
+                border-bottom: none;
+                background: linear-gradient(135deg, #4e54c8, #8f94fb);
+                color: white;
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* .note-detail-header::before {
+                content: "";
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 100%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+                transform: rotate(30deg);
+            } */
+
+            .note-detail-header h5 {
+                font-weight: 600;
+                letter-spacing: 0.5px;
+            }
+
+            .action-buttons .btn {
+                border-radius: 50px;
+                padding: 8px 15px;
+                font-weight: 500;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s ease;
+            }
+
+            .action-buttons .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .note-detail-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+
+            .note-detail-table th {
+                width: 35%;
+                background-color: #f8f9fa;
+                border-right: 1px solid #e9ecef;
+                font-weight: 600;
+                color: #495057;
+                padding: 1rem;
+            }
+
+            .note-detail-table td {
+                padding: 1rem;
+                border-bottom: 1px solid #e9ecef;
+                color: #212529;
+                vertical-align: middle;
+            }
+
+            .note-detail-table tr:last-child td {
+                border-bottom: none;
+            }
+
+            .note-image-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+                padding: 20px;
+                background-color: #f8f9fa;
+                border-radius: 10px;
+                box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+            }
+
+            .note-image {
+                max-width: 100%;
+                max-height: 350px;
+                object-fit: contain;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s ease;
+            }
+
+            .note-image:hover {
+                transform: scale(1.02);
+            }
+
+            .description-container {
+                background-color: white;
+                border-radius: 10px;
+                padding: 1.5rem;
+                margin-top: 2rem;
+                border-left: 5px solid #4e54c8;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            }
+
+            .description-title {
+                color: #4e54c8;
+                margin-bottom: 1rem;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+            }
+
+            .description-content {
+                color: #495057;
+                line-height: 1.7;
+                font-size: 1rem;
+            }
+
+         .status-badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 6px 12px;
+                border-radius: 50px;
+                font-size: 0.875rem;
+                font-weight: 500;
+                letter-spacing: 0.3px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                transition: all 0.2s ease;
+            }
+
+            .status-indicator {
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                margin-right: 8px;
+                animation: pulse 2s infinite;
+            }
+
+            .status-active {
+                color: #28a745;
+            }
+
+            .status-active .status-indicator {
+                background-color: #28a745;
+                box-shadow: 0 0 0 rgba(40, 167, 69, 0.4);
+            }
+
+            .status-inactive {
+                background-color: rgba(108, 117, 125, 0.15);
+                color: #6c757d;
+            }
+
+            .status-inactive .status-indicator {
+                background-color: #6c757d;
+            }
+
+            @keyframes pulse {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+                }
+
+                70% {
+                    box-shadow: 0 0 0 6px rgba(40, 167, 69, 0);
+                }
+
+                100% {
+                    box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+                }
+            } 
+
+        @media (max-width: 768px) {
+        .note-detail-table th {
+        width: 40%;
+        }
+
+        .note-image-container {
+        margin-top: 20px;
+        height: auto;
+        }
+        }
+        </style>
+    </head>
+
+    <body>
+        <div class="main-content">
+            <div class="note-detail-container">
+                <div class="note-detail-card">
+                    <div class="card-header note-detail-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-sticky-note me-2"></i>Note Details
+                        </h5>
+                        <div class="action-buttons">
+                            <a href="/note/edit/<%= note._id %>" class="btn btn-warning me-2">
+                                <i class="fas fa-edit me-1"></i> Edit
+                            </a>
+                            <a href="/note" class="btn btn-light">
+                                <i class="fas fa-arrow-left me-1"></i> Back
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row">   
+                            <!-- Left Column - Details -->
+                            <div class="col-lg-6">
+                                <table class="note-detail-table">
+                                    <tr>
+                                        <th><i class="fas fa-heading detail-icon"></i>Title</th>
+                                        <td>
+                                            <%= note.title %>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-user-tie detail-icon"></i>Related To</th>
+                                        <td>
+                                            <% if (note.relatedTo) { %>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="me-2">
+                                                        <i class="fas fa-user-circle fa-lg text-primary"></i>
+                                                    </div>
+                                                    <div>
+                                                        <span class="fw-medium">
+                                                            <%= note.relatedTo.firstName %>
+                                                                <%= note.relatedTo.lastName || '' %>
+                                                        </span>
+                                                        <br>
+                                                        <small class="text-muted">ID: <%= note.relatedTo._id %></small>
+                                                    </div>
+                                                </div>
+                                                <% } else { %>
+                                                    <span class="text-muted">N/A</span>
+                                                    <% } %>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-info-circle detail-icon"></i>Status</th>
+                                        <td>
+                                            <span
+                                                class="status-badge status-<%= note.status === 'Active' ? 'active' : 'inactive' %>">
+                                                <span class="status-indicator"></span>
+                                                <span class="status-text">
+                                                    <%= note.status || 'N/A' %>
+                                                </span>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-calendar-plus detail-icon"></i>Created At</th>
+                                        <td>
+                                            <i class="far fa-clock me-2 text-muted"></i>
+                                            <%= note.createdAt.toLocaleString() %>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="fas fa-calendar-check detail-icon"></i>Updated At</th>
+                                        <td>
+                                            <i class="far fa-clock me-2 text-muted"></i>
+                                            <%= note.updatedAt.toLocaleString() %>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Right Column - Image -->
+                            <% if (note.imageUrl) { %>
+                                <div class="col-lg-6">
+                                    <div class="note-image-container h-100">
+                                        <img src="<%= note.imageUrl %>" class="note-image" alt="Note Image">
+                                    </div>
+                                </div>
+                                <% } %>
+                        </div>
+
+                        <!-- Description Section -->
+                        <div class="description-container">
+                            <h6 class="description-title">
+                                <i class="fas fa-align-left me-2"></i>Description
+                            </h6>
+                            <div class="description-content">
+                                <%= note.description
+                                    || '<span class="fst-italic text-muted">No description provided.</span>' %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    </html>

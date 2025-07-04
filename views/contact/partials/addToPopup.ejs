@@ -1,10 +1,6 @@
-
-
-
-<!-- Add To Modal -->
 <div class="modal fade" id="addToModal" tabindex="-1">
   <div class="modal-dialog">
-    <form id="addToForm" method="POST">
+    <form id="addToForm" method="POST" action="/candidate/quick-create">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Add Contact To</h5>
@@ -14,8 +10,8 @@
           <input type="hidden" name="contactId" id="popupContactId">
           <p>Select where to add this contact:</p>
           <div class="d-grid gap-2">
-            <button type="submit" formaction="/candidate/quick-create" class="btn btn-success">✅ Add To Candidate</button>
-            <button type="submit" formaction="/manager/quick-create" class="btn btn-info">👔 Add To Manager</button>
+            <button type="submit" class="btn btn-success">Add To Candidate</button>
+            <button type="button" class="btn btn-info">Add To Manager</button>
           </div>
         </div>
       </div>

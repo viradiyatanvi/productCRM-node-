@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRM Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary-color: #4e73df;
@@ -141,6 +142,17 @@
             margin-right: 8px;
         }
 
+        /* Charts Container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        .chart-small {
+            height: 300px;
+        }
+
         /* Tables */
         .table-responsive {
             border-radius: 8px;
@@ -163,23 +175,45 @@
         }
 
         /* Quick Actions */
-        .quick-action-btn {
-            transition: all 0.3s ease;
-            border-radius: 8px;
-            padding: 20px 10px;
+            .quick-action-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background-color: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
             text-align: center;
-            border: 1px solid #e3e6f0;
-        }
+            justify-content: center;
+            }
 
-        .quick-action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-        }
+            .quick-action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            text-decoration: none !important;
+            }
 
-        .quick-action-btn i {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
+            .quick-action-btn i {
+            margin-bottom: 8px;
+            }
+
+            .quick-action-btn span {
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+            }
+
+            .quick-actions-wrapper {
+            overflow-x: auto;
+            padding-bottom: 10px;
+            }
+            .quick-actions-wrapper::-webkit-scrollbar {
+            height: 6px;
+            }
+            .quick-actions-wrapper::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 10px;
+            }
+
 
         /* Empty State */
         .empty-state {
@@ -206,6 +240,10 @@
             
             .card-body {
                 padding: 15px;
+            }
+
+            .chart-container {
+                height: 300px;
             }
         }
 
@@ -260,16 +298,16 @@
                     <h5 class="mb-0">Dashboard Analytics</h5>
                     <div>
                         <div class="btn-group" role="group">
-                            <a href="/?range=today" class="btn btn-sm <%= query.range === 'today' || !query.range ? 'btn-primary' : 'btn-outline-primary' %>">
+                            <a href="/?range=today" class="btn btn-sm <%= query.range === 'today' || !query.range ? 'btn-secondary' : 'btn-outline-secondary' %>">
                                 Today
                             </a>
-                            <a href="/?range=week" class="btn btn-sm <%= query.range === 'week' ? 'btn-primary' : 'btn-outline-primary' %>">
+                            <a href="/?range=week" class="btn btn-sm <%= query.range === 'week' ? 'btn-secondary' : 'btn-outline-secondary' %>">
                                 This Week
                             </a>
-                            <a href="/?range=month" class="btn btn-sm <%= query.range === 'month' ? 'btn-primary' : 'btn-outline-primary' %>">
+                            <a href="/?range=month" class="btn btn-sm <%= query.range === 'month' ? 'btn-secondary' : 'btn-outline-secondary' %>">
                                 This Month
                             </a>
-                            <a href="/?range=all" class="btn btn-sm <%= query.range === 'all' ? 'btn-primary' : 'btn-outline-primary' %>">
+                            <a href="/?range=all" class="btn btn-sm <%= query.range === 'all' ? 'btn-secondary' : 'btn-outline-secondary' %>">
                                 All Time
                             </a>
                         </div>
@@ -448,13 +486,87 @@
             </div>
         </div>
 
+        <!-- Charts Section -->
+        <div class="row mb-4">
+            <!-- Sales Trend Chart -->
+            <div class="col-lg-8 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-line me-2" style="color: #343a40;"></i>
+                            Sales & Lead Trends
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="salesTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lead Status Distribution -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-pie me-2" style="color: #343a40;"></i>
+                            Lead Status Distribution
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container chart-small">
+                            <canvas id="leadStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- More Charts -->
+        <div class="row mb-4">
+            <!-- Monthly Performance -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar me-2" style="color: #343a40;"></i>
+                            Monthly Performance Overview
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="monthlyPerformanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Follow-up Completion Rate -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-area me-2" style="color: #343a40;"></i>
+                            Follow-up Completion Trends
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="followupChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <!-- Follow-ups Section -->
             <div class="col-lg-6 mb-4">
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
-                            <i class="fas fa-phone text-primary me-2"></i>
+                            <i class="fas fa-phone me-2" style="color: #343a40;"></i>
                             <% if (query.range === 'today' || !query.range) { %>
                                 Today's Follow-ups
                             <% } else if (query.range === 'week') { %>
@@ -465,7 +577,7 @@
                                 All Follow-ups
                             <% } %>
                         </h5>
-                        <a href="/followup" class="btn btn-sm btn-outline-primary">View All</a>
+                        <a href="/followup" class="btn btn-sm btn-outline-secondary">View All</a>
                     </div>
                     <div class="card-body">
                         <% if (todaysFollowups.length > 0) { %>
@@ -488,7 +600,7 @@
                                                 </td>
                                                 <td>
                                                     <a href="tel:<%= followup.lead.phone %>" class="text-decoration-none">
-                                                        <i class="fas fa-phone text-success me-1"></i>
+                                                        <i class="fas fa-phone me-1" style="color: #343a40;"></i>
                                                         <%= followup.lead.phone %>
                                                     </a>
                                                 </td>
@@ -501,7 +613,7 @@
                                                     </small>
                                                 </td>
                                                 <td>
-                                                    <a href="/leads/<%= followup.lead._id %>" class="btn btn-sm btn-outline-primary">
+                                                    <a href="/leads/<%= followup.lead._id %>" class="btn btn-sm btn-outline-secondary">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                 </td>
@@ -512,7 +624,7 @@
                             </div>
                         <% } else { %>
                             <div class="empty-state">
-                                <i class="fas fa-calendar-check text-success"></i>
+                                <i class="fas fa-calendar-check" style="color: #343a40;"></i>
                                 <p class="mt-3 text-muted">No follow-ups scheduled</p>
                             </div>
                         <% } %>
@@ -525,10 +637,10 @@
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
-                            <i class="fas fa-users text-success me-2"></i>
+                            <i class="fas fa-users me-2" style="color: #343a40;"></i>
                             Recent Customers
                         </h5>
-                        <a href="/customers/add" class="btn btn-sm btn-primary">
+                        <a href="/customers/add" class="btn btn-sm text-white" style="background-color: #343a40;">
                             <i class="fas fa-plus"></i>
                         </a>
                     </div>
@@ -539,7 +651,7 @@
                                     <div class="d-flex align-items-center">
                                         <div class="flex-grow-1">
                                             <h6 class="mb-1">
-                                                <a href="/customers/<%= customer._id %>" class="text-decoration-none">
+                                                <a href="/customers/<%= customer._id %>" class="text-decoration-none" style="color: #343a40;">
                                                     <%= customer.name %>
                                                 </a>
                                             </h6>
@@ -551,7 +663,7 @@
                                                 <i class="fas fa-phone me-1"></i>
                                                 <%= customer.phone %>
                                             </small>
-                                            <small class="text-primary">
+                                            <small class="" style="color: #343a40;">
                                                 <i class="fas fa-map-marker-alt me-1"></i>
                                                 <%= customer.city %>, <%= customer.state %>
                                             </small>
@@ -570,9 +682,9 @@
                             <% }); %>
                         <% } else { %>
                             <div class="empty-state">
-                                <i class="fas fa-users text-success"></i>
+                                <i class="fas fa-users" style="color: #343a40;"></i>
                                 <p class="mt-3 text-muted">No recent customers</p>
-                                <a href="/customers/add" class="btn btn-success btn-sm">Add Customer</a>
+                                <a href="/customers/add" class="btn btn-success btn-sm text-white" style="background-color: #343a40;">Add Customer</a>
                             </div>
                         <% } %>
                     </div>
@@ -587,10 +699,10 @@
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
-                            <i class="fas fa-user-plus text-primary me-2"></i>
+                            <i class="fas fa-user-plus me-2" style="color: #343a40;"></i>
                             Recent Leads
                         </h5>
-                        <a href="/leads/add" class="btn btn-sm btn-primary">
+                        <a href="/leads/add" class="btn btn-sm text-white" style="background-color: #343a40;">
                             <i class="fas fa-plus"></i>
                         </a>
                     </div>
@@ -601,7 +713,7 @@
                                     <div class="d-flex align-items-center">
                                         <div class="flex-grow-1">
                                             <h6 class="mb-1">
-                                                <a href="/leads/<%= lead._id %>" class="text-decoration-none">
+                                                <a href="/leads/<%= lead._id %>" class="text-decoration-none" style="color: #343a40;">
                                                     <%= lead.name %>
                                                 </a>
                                             </h6>
@@ -614,7 +726,7 @@
                                                 <%= lead.phone %>
                                             </small>
                                             <% if (lead.interestedProduct) { %>
-                                                <small class="text-primary">
+                                                <small class="" style="color: #343a40;">
                                                     <i class="fas fa-box me-1"></i>
                                                     <%= lead.interestedProduct.name %>
                                                 </small>
@@ -639,9 +751,9 @@
                             <% }); %>
                         <% } else { %>
                             <div class="empty-state">
-                                <i class="fas fa-user-plus text-primary"></i>
+                                <i class="fas fa-user-plus" style="color: #343a40;"></i>
                                 <p class="mt-3 text-muted">No recent leads</p>
-                                <a href="/leads/add" class="btn btn-primary btn-sm">Add First Lead</a>
+                                <a href="/leads/add" class="btn text-white btn-sm" style="background-color: #343a40;">Add First Lead</a>
                             </div>
                         <% } %>
                     </div>
@@ -653,10 +765,10 @@
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
-                            <i class="fas fa-address-book text-info me-2"></i>
+                            <i class="fas fa-address-book me-2" style="color: #343a40;"></i>
                             Recent Contacts
                         </h5>
-                        <a href="/contact/add" class="btn btn-sm btn-primary">
+                        <a href="/contact/add" class="btn btn-sm text-white" style="background-color: #343a40;">
                             <i class="fas fa-plus"></i>
                         </a>
                     </div>
@@ -667,8 +779,8 @@
                                     <div class="d-flex align-items-center">
                                         <div class="flex-grow-1">
                                             <h6 class="mb-1">
-                                                <a href="/contact/<%= contact._id %>" class="text-decoration-none">
-                                                    <%= contact.fullName %>
+                                                <a href="/contact/<%= contact._id %>" class="text-decoration-none" style="color:#343a40;">
+                                                    <%= contact.firstName %>
                                                 </a>
                                             </h6>
                                             <small class="text-muted">
@@ -677,7 +789,7 @@
                                             </small>
                                             <small class="text-muted">
                                                 <i class="fas fa-phone me-1"></i>
-                                                <%= contact.phone %>
+                                                <%= contact.phoneNumber %>
                                             </small>
                                         </div>
                                         <div class="text-end">
@@ -694,9 +806,9 @@
                             <% }); %>
                         <% } else { %>
                             <div class="empty-state">
-                                <i class="fas fa-address-book text-info"></i>
+                                <i class="fas fa-address-book" style="color: #343a40;"></i>
                                 <p class="mt-3 text-muted">No contacts yet</p>
-                                <a href="/contact/add" class="btn btn-info btn-sm">Add Contact</a>
+                                <a href="/contact/add" class="btn text-white btn-sm" style="background-color: #343a40;">Add Contact</a>
                             </div>
                         <% } %>
                     </div>
@@ -708,10 +820,10 @@
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
-                            <i class="fas fa-file-invoice-dollar text-warning me-2"></i>
+                            <i class="fas fa-file-invoice-dollar me-2" style="color: #343a40;"></i>
                             Pending Quotations
                         </h5>
-                        <a href="/quotations/add" class="btn btn-sm btn-primary">
+                        <a href="/quotations/add" class="btn btn-sm text-white" style="background-color: #343a40;">
                             <i class="fas fa-plus"></i>
                         </a>
                     </div>
@@ -722,7 +834,7 @@
                                     <div class="d-flex align-items-center">
                                         <div class="flex-grow-1">
                                             <h6 class="mb-1">
-                                                <a href="/quotations/<%= quotation._id %>" class="text-decoration-none">
+                                                <a href="/quotations/<%= quotation._id %>" class="text-decoration-none" style="color: #343a40;">
                                                     Quote #<%= quotation.quotationNumber %>
                                                 </a>
                                             </h6>
@@ -734,7 +846,7 @@
                                                 <i class="fas fa-calendar me-1"></i>
                                                 Valid until <%= moment(quotation.validUntil).format('MMM D, YYYY') %>
                                             </small>
-                                            <small class="text-primary">
+                                            <small class="" style="color: #343a40;">
                                                 <i class="fas fa-dollar-sign me-1"></i>
                                                 ₹<%= quotation.totalAmount.toLocaleString() %>
                                             </small>
@@ -754,9 +866,9 @@
                             <% }); %>
                         <% } else { %>
                             <div class="empty-state">
-                                <i class="fas fa-file-invoice-dollar text-warning"></i>
+                                <i class="fas fa-file-invoice-dollar" style="color: #343a40;"></i>
                                 <p class="mt-3 text-muted">No pending quotations</p>
-                                <a href="/quotations/add" class="btn btn-warning btn-sm">Create Quotation</a>
+                                <a href="/quotations/add" class="btn btn-sm text-white" style="background-color: #343a40;">Create Quotation</a>
                             </div>
                         <% } %>
                     </div>
@@ -765,76 +877,261 @@
         </div>
 
         <!-- Quick Actions -->
-       <div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-bolt text-warningl"></i>
-                    Quick Actions
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-2 mb-3">
-                        <a href="/leads/add" class="quick-action-btn btn-outline-primary text-primary">
-                            <i class="fas fa-user-plus"></i>
-                            <span>Add Lead</span>
-                        </a>
-                    </div>
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="fas fa-bolt" style="color: #343a40;"></i> Quick Actions
+        </h5>
+      </div>
+      <div class="card-body">
+        <!-- Horizontal scroll on small screens -->
+        <div class="d-flex flex-wrap gap-3 overflow-auto" style="margin-left: 15px;">
+          <a href="/leads/add" class="quick-action-btn btn btn-outline-primary d-flex flex-column align-items-center text-decoration-none text-primary p-2">
+            <i class="fas fa-user-plus fa-2x"></i>
+            <span>Add Lead</span>
+          </a>
 
-                    <div class="col-md-2 mb-3">
-                        <a href="/followup" class="quick-action-btn btn-outline-success text-success">
-                            <i class="fas fa-phone"></i>
-                            <span>Follow-ups</span>
-                        </a>
-                    </div>
+          <a href="/followup" class="quick-action-btn btn btn-outline-success d-flex flex-column align-items-center text-decoration-none text-success p-2">
+            <i class="fas fa-phone fa-2x"></i>
+            <span>Follow-ups</span>
+          </a>
 
-                    <div class="col-md-2 mb-3">
-                        <a href="/contact/add" class="quick-action-btn btn-outline-info text-info">
-                            <i class="fas fa-address-book"></i>
-                            <span>Add Contact</span>
-                        </a>
-                    </div>
+          <a href="/contact/add" class="quick-action-btn btn btn-outline-info d-flex flex-column align-items-center text-decoration-none text-info p-2">
+            <i class="fas fa-address-book fa-2x"></i>
+            <span>Add Contact</span>
+          </a>
 
-                    <div class="col-md-2 mb-3">
-                        <a href="/quotations/add" class="quick-action-btn btn-outline-warning text-warning">
-                            <i class="fas fa-file-invoice-dollar"></i>
-                            <span>Create Quote</span>
-                        </a>
-                    </div>
+          <a href="/quotations/add" class="quick-action-btn btn btn-outline-warning d-flex flex-column align-items-center text-decoration-none text-warning p-2">
+            <i class="fas fa-file-invoice-dollar fa-2x"></i>
+            <span>Create Quote</span>
+          </a>
 
-                    <div class="col-md-2 mb-3">
-                        <a href="/candidate/add" class="quick-action-btn btn-outline-danger text-danger">
-                            <i class="fas fa-user-graduate"></i>
-                            <span>Add Candidate</span>
-                        </a>
-                    </div>
+          <a href="/candidate/add" class="quick-action-btn btn btn-outline-danger d-flex flex-column align-items-center text-decoration-none text-danger p-2">
+            <i class="fas fa-user-graduate fa-2x"></i>
+            <span>Add Candidate</span>
+          </a>
 
-                    <% if (user && (user.role === 'admin' || user.role === 'sales')) { %>
-                        <div class="col-md-2 mb-3">
-                            <a href="/sales/add" class="quick-action-btn btn-outline-secondary text-secondary">
-                                <i class="fas fa-dollar-sign"></i>
-                                <span>Record Sale</span>
-                            </a>
-                        </div>
-                    <% } %>
+          <% if (user && (user.role === 'admin' || user.role === 'sales')) { %>
+            <a href="/sales/add" class="quick-action-btn btn btn-outline-secondary d-flex flex-column align-items-center text-decoration-none text-secondary p-2">
+              <i class="fas fa-dollar-sign fa-2x"></i>
+              <span>Record Sale</span>
+            </a>
+          <% } %>
 
-                    <div class="col-md-2 mb-3">
-                        <a href="/manager/add" class="quick-action-btn btn-outline-secondary text-secondary">
-                            <i class="fas fa-user-tie"></i>
-                            <span>Office</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
+          <a href="/manager/add" class="quick-action-btn btn btn-outline-secondary d-flex flex-column align-items-center text-decoration-none text-secondary p-2">
+            <i class="fas fa-user-tie fa-2x"></i>
+            <span>Office</span>
+          </a>
         </div>
+      </div>
     </div>
+  </div>
 </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script> -->
+
+    <script>
+        // Chart.js Configuration
+        Chart.defaults.font.family = 'Nunito';
+        Chart.defaults.font.size = 12;
+        Chart.defaults.color = '#858796';
+
+        // Parse chart data from server
+        const chartData = <%-JSON.stringify(stats.chartData)%>;
+
+        // Sales Trend Chart
+        const salesTrendCtx = document.getElementById('salesTrendChart').getContext('2d');
+        new Chart(salesTrendCtx, {
+            type: 'line',
+            data: {
+                labels: chartData.salesTrend.labels,
+                datasets: [{
+                    label: 'Sales Amount (₹)',
+                    data: chartData.salesTrend.salesData,
+                    borderColor: '#4e73df',
+                    backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.3,
+                    yAxisID: 'y'
+                }, {
+                    label: 'Leads Count',
+                    data: chartData.salesTrend.leadsData,
+                    borderColor: '#1cc88a',
+                    backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.3,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Sales Amount (₹)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '₹' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Leads Count'
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
+                }
+            }
+        });
+
+        // Lead Status Chart
+        const leadStatusCtx = document.getElementById('leadStatusChart').getContext('2d');
+        new Chart(leadStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: chartData.leadStatus.labels,
+                datasets: [{
+                    data: chartData.leadStatus.data,
+                    backgroundColor: [
+                        '#4e73df', // new
+                        '#1cc88a', // interested  
+                        '#36b9cc', // contacted
+                        '#f6c23e', // qualified
+                        '#e74a3b'  // closed
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Monthly Performance Chart
+        const monthlyPerformanceCtx = document.getElementById('monthlyPerformanceChart').getContext('2d');
+        new Chart(monthlyPerformanceCtx, {
+            type: 'bar',
+            data: {
+                labels: chartData.monthlyPerformance.labels,
+                datasets: [{
+                    label: 'Leads',
+                    data: chartData.monthlyPerformance.leads,
+                    backgroundColor: 'rgba(78, 115, 223, 0.8)',
+                    borderColor: '#4e73df',
+                    borderWidth: 1
+                }, {
+                    label: 'Customers',
+                    data: chartData.monthlyPerformance.customers,
+                    backgroundColor: 'rgba(28, 200, 138, 0.8)',
+                    borderColor: '#1cc88a',
+                    borderWidth: 1
+                }, {
+                    label: 'Sales',
+                    data: chartData.monthlyPerformance.sales,
+                    backgroundColor: 'rgba(246, 194, 62, 0.8)',
+                    borderColor: '#f6c23e',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Count'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Follow-up Chart
+        const followupCtx = document.getElementById('followupChart').getContext('2d');
+        new Chart(followupCtx, {
+            type: 'line',
+            data: {
+                labels: chartData.followupTrend.labels,
+                datasets: [{
+                    label: 'Scheduled Follow-ups',
+                    data: chartData.followupTrend.scheduled,
+                    borderColor: '#e74a3b',
+                    backgroundColor: 'rgba(231, 74, 59, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.3
+                }, {
+                    label: 'Completed Follow-ups',
+                    data: chartData.followupTrend.completed,
+                    borderColor: '#1cc88a',
+                    backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Follow-ups Count'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

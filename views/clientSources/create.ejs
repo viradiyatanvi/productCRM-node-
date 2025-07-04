@@ -1,0 +1,31 @@
+<%- include('../layout') %>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+
+    <body>
+        <div class="main-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Add New Client Source</h2>
+                </div>
+                <div class="card-body">
+                    <form action="/client/cientSource" method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <button type="submit" class="btn text-white" style="background-color: #343a40;">Save</button>
+                        <a href="/client/cientSource" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    </html>

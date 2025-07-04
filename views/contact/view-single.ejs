@@ -1,0 +1,126 @@
+<%- include('../layout') %>
+  <!DOCTYPE html>
+  <html>
+
+  <head>
+    <title>Contact Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div class="main-content">
+      <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Contact Details</h2>
+          <a href="/contact/list" class="btn btn-secondary">Back to List</a>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h4>
+              <%= contact.firstName %>
+                <%= contact.lastName %>
+            </h4>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h5 class="mb-3">Contact Information</h5>
+                <p><strong>Client:</strong>
+                  <% if (contact.client && contact.client._id) { %>
+                    <a href="/clients/view/<%= contact.client._id %>">
+                      <%= contact.client.clientName || 'Client' %>
+                    </a>
+                    <% } else { %>
+                      N/A
+                      <% } %>
+                </p>
+                <p><strong>Phone:</strong>
+                  <%= contact.phoneNumber %>
+                </p>
+                <p><strong>Email:</strong>
+                  <%= contact.email %>
+                </p>
+                <p><strong>Job Title:</strong>
+                  <%= contact.jobTitle || 'N/A' %>
+                </p>
+                <p><strong>Fax:</strong>
+                  <%= contact.fax || 'N/A' %>
+                </p>
+                <!-- <p><strong>Source:</strong>
+                  <%= contact.source || 'N/A' %>
+                </p> -->
+                <p><strong>Source:</strong>
+                  <% if (contact.clientSource) { %>
+                    <%= contact.clientSource.name %>
+                      <% } else { %>
+                        N/A
+                        <% } %>
+                </p>
+                <p><strong>Assigned To:</strong>
+                  <%= contact.assignedTo?.name || 'Unassigned' %>
+                </p>
+              </div>
+              <div class="col-md-6">
+                <h5 class="mb-3">Billing Address</h5>
+                <p>
+                  <%= contact.billingStreet %>
+                </p>
+                <p>
+                  <%= contact.billingCity %>, <%= contact.billingState %>
+                      <%= contact.billingCode %>
+                </p>
+                <p>
+                  <%= contact.billingCountry %>
+                </p>
+
+                <h5 class="mt-4 mb-3">Shipping Address</h5>
+                <% if (contact.shippingSameAsBilling) { %>
+                  <p>Same as billing address</p>
+                  <% } else { %>
+                    <p>
+                      <%= contact.shippingStreet %>
+                    </p>
+                    <p>
+                      <%= contact.shippingCity %>, <%= contact.shippingState %>
+                          <%= contact.shippingCode %>
+                    </p>
+                    <p>
+                      <%= contact.shippingCountry %>
+                    </p>
+                    <% } %>
+              </div>
+            </div>
+
+            <% if (contact.attachments && contact.attachments.length> 0) { %>
+              <div class="mt-4">
+                <h5>Attachments</h5>
+                <div class="list-group">
+                  <% contact.attachments.forEach(attachment=> { %>
+                    <a href="<%= attachment %>" class="list-group-item list-group-item-action" target="_blank">
+                      <%= attachment.split('/').pop() %>
+                    </a>
+                    <% }); %>
+                </div>
+              </div>
+              <% } %>
+
+                <div class="mt-4">
+                  <!-- <a href="/contact/edit/<%= contact._id %>" class="btn btn-warning">Edit Contact</a> -->
+                  <form action="/contact/delete/<%= contact._id %>" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete
+                      Contact</button>
+                  </form>
+                </div>
+          </div>
+          <div class="card-footer text-muted">
+            Created on: <%= contact.createdAt.toLocaleDateString() %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+
+  </html>

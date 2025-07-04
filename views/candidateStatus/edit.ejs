@@ -1,0 +1,30 @@
+<%- include('../layout') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit CandidateStatus</title>
+</head>
+<body>
+    
+   <div class="main-content">
+     <h2>Edit Candidate</h2>
+
+    <form action="/candidate/status/edit/<%= candidate._id %>" method="POST">
+        <label>Name:</label>
+        <input type="text" name="name" value="<%= candidate.name %>" required><br><br>
+
+        <label>Status:</label>
+        <select name="status">
+            <option value="Active" <%= candidate.status === 'Active' ? 'selected' : '' %>>Active</option>
+            <option value="Inactive" <%= candidate.status === 'Inactive' ? 'selected' : '' %>>Inactive</option>
+        </select><br><br>
+
+        <button type="submit">Update</button>
+    </form>
+
+    <a href="/candidate/status">← Back to List</a>
+   </div>
+</body>
+</html>

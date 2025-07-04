@@ -1,0 +1,215 @@
+<%- include('../layout') %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Client</title>
+    <style>
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .attachment-actions {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Edit Client</h4>
+                    <a href="/clients/<%= client._id %>" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Details
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form action="/clients/<%= client._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Client Name*</label>
+                                <input type="text" class="form-control" name="clientName" value="<%= client.clientName %>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fax</label>
+                                <input type="text" class="form-control" name="fax" value="<%= client.fax %>">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Telegram*</label>
+                                <input type="text" class="form-control" name="telegram" value="<%= client.telegram %>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Select Industry*</label>
+                                <select class="form-select" name="industry" required>
+                                    <% industries.forEach(industry => { %>
+                                        <option value="<%= industry._id %>" <%= client.industry.toString() === industry._id.toString() ? 'selected' : '' %>>
+                                            <%= industry.name %>
+                                        </option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">About</label>
+                            <textarea class="form-control" name="about" rows="3"><%= client.about %></textarea>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Contact Number*</label>
+                                <input type="text" class="form-control" name="contactNumber" value="<%= client.contactNumber %>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Website</label>
+                                <input type="url" class="form-control" name="website" value="<%= client.website %>">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Server*</label>
+                                <input type="text" class="form-control" name="server" value="<%= client.server %>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Select Source*</label>
+                                <select class="form-select" name="clientSource" required>
+                                    <% clientSources.forEach(source => { %>
+                                        <option value="<%= source._id %>" <%= client.clientSource.toString() === source._id.toString() ? 'selected' : '' %>>
+                                            <%= source.name %>
+                                        </option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h4 class="mt-4">Billing Address Information</h4>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Billing Street*</label>
+                                <input type="text" class="form-control" name="billingStreet" value="<%= client.billingStreet %>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Billing State*</label>
+                                <input type="text" class="form-control" name="billingState" value="<%= client.billingState %>" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Billing Country*</label>
+                                <input type="text" class="form-control" name="billingCountry" value="<%= client.billingCountry %>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Billing City*</label>
+                                <input type="text" class="form-control" name="billingCity" value="<%= client.billingCity %>" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Billing Code*</label>
+                            <input type="text" class="form-control" name="billingCode" value="<%= client.billingCode %>" required>
+                        </div>
+
+                        <h4 class="mt-4">Shipping Address Information</h4>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Shipping Street</label>
+                                <input type="text" class="form-control" name="shippingStreet" value="<%= client.shippingStreet %>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Shipping State</label>
+                                <input type="text" class="form-control" name="shippingState" value="<%= client.shippingState %>">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Shipping City</label>
+                                <input type="text" class="form-control" name="shippingCity" value="<%= client.shippingCity %>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Shipping Code</label>
+                                <input type="text" class="form-control" name="shippingCode" value="<%= client.shippingCode %>">
+                            </div>
+                        </div>
+
+                        <h4 class="mt-4">Attachment Information</h4>
+                        
+                        <% if (client.attachments && client.attachments.length > 0) { %>
+                            <div class="mb-3">
+                                <label class="form-label">Current Attachments</label>
+                                <% client.attachments.forEach((attachment, index) => { %>
+                                    <div class="attachment-item">
+                                        <i class="fas fa-file-alt me-2"></i>
+                                        <span><%= attachment.originalname %></span>
+                                        <div class="attachment-actions">
+                                            <a href="/uploads/<%= attachment.filename %>" download class="text-primary me-2">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            <a href="/uploads/<%= attachment.filename %>" target="_blank" class="text-info me-2">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="#" class="text-danger" onclick="deleteAttachment('<%= client._id %>', '<%= attachment._id %>')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } %>
+
+                        <div class="mb-3">
+                            <label class="form-label">Add New Files</label>
+                            <input type="file" class="form-control" name="attachments" multiple>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Update Client
+                            </button>
+                            <a href="/clients/<%= client._id %>" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function deleteAttachment(clientId, attachmentId) {
+            if (confirm('Are you sure you want to delete this attachment?')) {
+                fetch(`/clients/${clientId}/attachments/${attachmentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Error deleting attachment');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting attachment');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

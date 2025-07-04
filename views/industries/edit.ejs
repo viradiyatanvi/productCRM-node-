@@ -1,0 +1,43 @@
+<%- include('../layout') %>
+
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+
+    <body>
+
+        <div class="main-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Edit Industry</h2>
+                </div>
+                <div class="card-body">
+                    <form action="/industries/<%= industry._id %>?_method=PUT" method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="<%= industry.name %>"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="active" <%=industry.status==='active' ? 'selected' : '' %>>Active
+                                </option>
+                                <option value="inactive" <%=industry.status==='inactive' ? 'selected' : '' %>>Inactive
+                                </option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn text-white" style="background-color: #343a40;">Update</button>
+                        <a href="/industries" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    </html>

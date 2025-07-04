@@ -1,0 +1,242 @@
+<%- include('../layout') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Job Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .info-card {
+            margin-bottom: 2rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+        }
+        .info-card-header {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .info-card-body {
+            padding: 1.5rem;
+        }
+        .detail-row {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .rich-text-content {
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Job Details</h2>
+                <a href="/job" class="btn btn-secondary">Back to List</a>
+            </div>
+
+            <div class="card info-card">
+                <div class="info-card-header">
+                    <h4>Basic Information</h4>
+                </div>
+                <div class="info-card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="detail-row">
+                                <div class="detail-label">Job Title</div>
+                                <div><%= job.title %></div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Client</div>
+                                <div>
+                                    <% if (job.client) { %>
+                                        <%= job.client.clientName %>
+                                    <% } else { %>
+                                        N/A
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Publish Date</div>
+                                <div><%= new Date(job.publishDate).toLocaleDateString() %></div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Industry</div>
+                                <div>
+                                    <% if (job.industry) { %>
+                                        <%= job.industry.name %>
+                                    <% } else { %>
+                                        N/A
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-row">
+                                <div class="detail-label">Job Open Status</div>
+                                <div>
+                                    <% if (job.jobOpenStatus) { %>
+                                        <span class="badge bg-<%= job.jobOpenStatus.name === 'Active' ? 'success' : 'warning' %>">
+                                            <%= job.jobOpenStatus.name %>
+                                        </span>
+                                    <% } else { %>
+                                        N/A
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Job Type</div>
+                                <div>
+                                    <% if (job.jobType) { %>
+                                        <%= job.jobType.name %>
+                                    <% } else { %>
+                                        N/A
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Experience Range</div>
+                                <div><%= job.minExperience %> - <%= job.maxExperience %> years</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Salary Range</div>
+                                <div><%= job.minSalary %> - <%= job.maxSalary %> <%= job.currency %></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="detail-row">
+                                <div class="detail-label">Total Vacancy</div>
+                                <div><%= job.totalVacancy %></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-row">
+                                <div class="detail-label">Application Deadline</div>
+                                <div><%= new Date(job.applicationDeadline).toLocaleDateString() %></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card info-card">
+                <div class="info-card-header">
+                    <h4>Address Information</h4>
+                </div>
+                <div class="info-card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="detail-row">
+                                <div class="detail-label">Street</div>
+                                <div><%= job.address.street || 'N/A' %></div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">City</div>
+                                <div><%= job.address.city || 'N/A' %></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-row">
+                                <div class="detail-label">State</div>
+                                <div><%= job.address.state || 'N/A' %></div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Country</div>
+                                <div><%= job.address.country || 'N/A' %></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card info-card">
+                <div class="info-card-header">
+                    <h4>Description Information</h4>
+                </div>
+                <div class="info-card-body">
+                    <div class="detail-row">
+                        <div class="detail-label">Roles & Responsibility</div>
+                        <div class="rich-text-content">
+                            <%= job.description.rolesResponsibility || 'N/A' %>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Job Requirements</div>
+                        <div class="rich-text-content">
+                            <%= job.description.jobRequirements || 'N/A' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card info-card">
+                <div class="info-card-header">
+                    <h4>Additional Requirements</h4>
+                </div>
+                <div class="info-card-body">
+                    <div class="rich-text-content">
+                        <%= job.description.additionalRequirements || 'N/A' %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card info-card">
+                <div class="info-card-header">
+                    <h4>Benefits</h4>
+                </div>
+                <div class="info-card-body">
+                    <div class="rich-text-content">
+                        <%= job.description.benefits || 'N/A' %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card info-card">
+                <div class="info-card-header">
+                    <h4>Apply Instruction</h4>
+                </div>
+                <div class="info-card-body">
+                    <div class="rich-text-content">
+                        <%= job.description.applyInstructions || 'N/A' %>
+                    </div>
+                    <% if (job.attachments && job.attachments.length > 0) { %>
+                        <div class="mt-3">
+                            <!-- <div class="detail-label">Attachments</div>
+                            <ul class="list-group">
+                                <% job.attachments.forEach(attachment => { %>
+                                    <li class="list-group-item">
+                                        <a href="<%= attachment.path %>" target="_blank"><%= attachment.filename %></a>
+                                    </li>
+                                <% }); %>
+                            </ul> -->
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+                <a href="/job/edit/<%= job._id %>" class="btn btn-warning me-2">Edit Job</a>
+                <form action="/job/delete/<%= job._id %>" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger" 
+                        onclick="return confirm('Are you sure you want to delete this job?')">
+                        Delete Job
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

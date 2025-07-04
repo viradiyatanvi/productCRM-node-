@@ -1,0 +1,279 @@
+<%- include('../layout') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Job</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .form-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+        }
+        .section-title {
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .rich-text-toolbar {
+            background-color: #f8f9fa;
+            padding: 0.5rem;
+            border: 1px solid #dee2e6;
+            border-bottom: none;
+            border-radius: 0.25rem 0.25rem 0 0;
+        }
+        .rich-text-editor {
+            min-height: 150px;
+            border: 1px solid #dee2e6;
+            padding: 0.75rem;
+            border-radius: 0 0 0.25rem 0.25rem;
+        }
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="container">
+            <div class="card mt-4">
+                <div class="card-header text-white" style="background-color: #343a40;">
+                    <h4>Edit Job</h4>
+                </div>
+                <div class="card-body">
+                    <% if (error) { %>
+                        <div class="alert alert-danger">
+                            <%= error %>
+                        </div>
+                    <% } %>
+
+                    <form method="POST" action="/job/edit/<%= job._id %>" enctype="multipart/form-data">
+                        <!-- Basic Information Section -->
+                        <div class="form-section">
+                            <h5 class="section-title">Basic Information</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Job Title *</label>
+                                    <input type="text" name="title" class="form-control" value="<%= job.title %>" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Client *</label>
+                                    <select name="client" class="form-control" required>
+                                        <option value="">Select Client</option>
+                                        <% clients.forEach(client => { %>
+                                            <option value="<%= client._id %>" <%= job.client && job.client._id.toString() === client._id.toString() ? 'selected' : '' %>>
+                                                <%= client.clientName %>
+                                            </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Publish Date</label>
+                                    <input type="date" name="publishDate" class="form-control" 
+                                        value="<%= new Date(job.publishDate).toISOString().split('T')[0] %>">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Industry *</label>
+                                    <select name="industry" class="form-control" required>
+                                        <option value="">Select Industry</option>
+                                        <% industries.forEach(industry => { %>
+                                            <option value="<%= industry._id %>" <%= job.industry && job.industry._id.toString() === industry._id.toString() ? 'selected' : '' %>>
+                                                <%= industry.name %>
+                                            </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Job Open Status *</label>
+                                    <select name="jobOpenStatus" class="form-control" required>
+                                        <option value="">Select Status</option>
+                                        <% jobOpenStatuses.forEach(status => { %>
+                                            <option value="<%= status._id %>" <%= job.jobOpenStatus && job.jobOpenStatus._id.toString() === status._id.toString() ? 'selected' : '' %>>
+                                                <%= status.name %>
+                                            </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Minimum Experience (Years) *</label>
+                                    <input type="number" name="minExperience" class="form-control" value="<%= job.minExperience %>" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Maximum Experience (Years) *</label>
+                                    <input type="number" name="maxExperience" class="form-control" value="<%= job.maxExperience %>" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Job Type *</label>
+                                    <select name="jobType" class="form-control" required>
+                                        <option value="">Select Job Type</option>
+                                        <% jobTypes.forEach(type => { %>
+                                            <option value="<%= type._id %>" <%= job.jobType && job.jobType._id.toString() === type._id.toString() ? 'selected' : '' %>>
+                                                <%= type.name %>
+                                            </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Minimum Salary *</label>
+                                    <input type="number" name="minSalary" class="form-control" value="<%= job.minSalary %>" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Maximum Salary *</label>
+                                    <input type="number" name="maxSalary" class="form-control" value="<%= job.maxSalary %>" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Currency</label>
+                                    <select name="currency" class="form-control">
+                                        <option value="BRL" <%= job.currency === 'BRL' ? 'selected' : '' %>>BRL</option>
+                                        <option value="USD" <%= job.currency === 'USD' ? 'selected' : '' %>>USD</option>
+                                        <option value="EUR" <%= job.currency === 'EUR' ? 'selected' : '' %>>EUR</option>
+                                        <option value="GBP" <%= job.currency === 'GBP' ? 'selected' : '' %>>GBP</option>
+                                        <option value="IND" <%= job.currency === 'IND' ? 'selected' : '' %>>IND</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Total Vacancy *</label>
+                                    <input type="number" name="totalVacancy" class="form-control" value="<%= job.totalVacancy %>" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Application Deadline *</label>
+                                    <input type="date" name="applicationDeadline" class="form-control" 
+                                        value="<%= new Date(job.applicationDeadline).toISOString().split('T')[0] %>" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Address Information Section -->
+                        <div class="form-section">
+                            <h5 class="section-title">Address Information</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Street</label>
+                                    <input type="text" name="street" class="form-control" value="<%= job.address.street %>">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">City</label>
+                                    <input type="text" name="city" class="form-control" value="<%= job.address.city %>">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">State</label>
+                                    <input type="text" name="state" class="form-control" value="<%= job.address.state %>">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Country</label>
+                                    <select name="country" class="form-control">
+                                        <option value="">Select Country</option>
+                                        <option value="Brazil" <%= job.address.country === 'Brazil' ? 'selected' : '' %>>Brazil</option>
+                                        <option value="United States" <%= job.address.country === 'United States' ? 'selected' : '' %>>United States</option>
+                                        <option value="United Kingdom" <%= job.address.country === 'United Kingdom' ? 'selected' : '' %>>United Kingdom</option>
+                                        <option value="Canada" <%= job.address.country === 'Canada' ? 'selected' : '' %>>Canada</option>
+                                        <option value="Ind" <%= job.address.country === 'India' ? 'selected' : '' %>>India</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Postal Code</label>
+                                    <input type="text" name="postalCode" class="form-control" value="<%= job.address.postalCode %>">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description Information Section -->
+                        <div class="form-section">
+                            <h5 class="section-title">Description Information</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Roles & Responsibility</label>
+                                <div class="rich-text-toolbar">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-command="bold"><i class="fas fa-bold"></i></button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-command="italic"><i class="fas fa-italic"></i></button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-command="underline"><i class="fas fa-underline"></i></button>
+                                </div>
+                                <textarea name="rolesResponsibility" class="form-control rich-text-editor"><%= job.description.rolesResponsibility %></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Job Requirements</label>
+                                <textarea name="jobRequirements" class="form-control rich-text-editor"><%= job.description.jobRequirements %></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Additional Requirements Section -->
+                        <div class="form-section">
+                            <h5 class="section-title">Additional Requirements</h5>
+                            <div class="mb-3">
+                                <textarea name="additionalRequirements" class="form-control rich-text-editor"><%= job.description.additionalRequirements %></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Benefits Section -->
+                        <div class="form-section">
+                            <h5 class="section-title">Benefits</h5>
+                            <div class="mb-3">
+                                <textarea name="benefits" class="form-control rich-text-editor"><%= job.description.benefits %></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Apply Instruction Section -->
+                        <div class="form-section">
+                            <h5 class="section-title">Apply Instruction</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Attachment Information</label>
+                                <% if (job.attachments && job.attachments.length > 0) { %>
+                                    <div class="mb-3">
+                                        <label class="form-label">Current Attachments</label>
+                                        <% job.attachments.forEach((attachment, index) => { %>
+                                            <div class="attachment-item">
+                                                <span><%= attachment.filename %></span>
+                                                <a href="<%= attachment.path %>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                <% } %>
+                                <input type="file" name="attachments" class="form-control" multiple>
+                            </div>
+                            <div class="mb-3">
+                                <textarea name="applyInstructions" class="form-control rich-text-editor"><%= job.description.applyInstructions %></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" class="btn text-white" style="background-color: #343a40;">Update Job</button>
+                            <a href="/job/view/<%= job._id %>" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simple rich text editor functionality
+        document.querySelectorAll('[data-command]').forEach(button => {
+            button.addEventListener('click', function() {
+                const command = this.getAttribute('data-command');
+                document.execCommand(command, false, null);
+            });
+        });
+    </script>
+</body>
+</html>

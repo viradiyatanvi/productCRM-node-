@@ -13,11 +13,11 @@
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="mb-0">
-                <i class="fas fa-file-invoice text-primary me-2"></i>
+                <i class="fas fa-file-invoice me-2" style="color: #343a40;"></i>
                 Invoice: <%= sale.invoiceNumber %>
             </h4>
             <div>
-                <button onclick="window.print()" class="btn btn-outline-primary me-2">
+                <button onclick="window.print()" class="btn btn-outline-secondary me-2">
                     <i class="fas fa-print me-1"></i>
                     Print Invoice
                 </button>
@@ -33,7 +33,7 @@
                 <!-- Invoice Header -->
                 <div class="row mb-4">
                     <div class="col-md-6">
-                        <h3 class="text-primary mb-3">
+                        <h3 class="text-dark mb-3">
                             <i class="fas fa-building me-2"></i>
                             Your Company Name
                         </h3>
@@ -78,7 +78,7 @@
                 <!-- Customer Information -->
                 <div class="row mb-4">
                     <div class="col-md-6">
-                        <h5 class="text-primary mb-3">Bill To:</h5>
+                        <h5 class="text-dark mb-3">Bill To:</h5>
                         <div class="border p-3 rounded">
                             <h6 class="mb-2">
                                 <%= sale.customer.name %>
@@ -109,7 +109,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <h5 class="text-primary mb-3">Sales Person:</h5>
+                        <h5 class="text-dark mb-3">Sales Person:</h5>
                         <div class="border p-3 rounded">
                             <h6 class="mb-2">
                                 <%= sale.salesPerson.name %>

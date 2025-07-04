@@ -1,0 +1,28 @@
+<%- include('../layout') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="main-content">
+        
+<div class="container mt-4">
+  <h2>Add New Note Type</h2>
+
+  <form method="POST" action="/note/notetype/add">
+    <div class="mb-3">
+      <label for="name" class="form-label">Type Name *</label>
+      <input type="text" class="form-control" id="name" name="name" 
+             value="<%= formData.name || '' %>" required>
+    </div>
+    
+    <button type="submit" class="btn text-white" style="background-color: #343a40;">Add Note Type</button>
+    <a href="/note/notetype" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+    </div>
+</body>
+</html>

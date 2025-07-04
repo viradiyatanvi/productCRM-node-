@@ -1,0 +1,202 @@
+<%- include('../layout') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Jobs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> -->
+    <style>
+        .highlight {
+            background-color: gray;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="container-fluid">
+            <div class="card mt-4 shadow">
+                <div class="card-header d-flex justify-content-between align-items-center text-white" style="background-color: #343a40;">
+                    <h4 class="mb-0">Manage Jobs</h4>
+                    <a href="/job/add" class="btn btn-light btn-sm">
+                        <i class="fas fa-plus me-1"></i> Add New Job
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Show
+                                <select id="entriesPerPage" class="form-select form-select-sm d-inline w-auto mx-2">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select> entries
+                            </label>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <label class="form-label">Search:
+                                <input type="search" id="searchInput" class="form-control form-control-sm d-inline w-auto ms-2"
+                                    placeholder="Search jobs...">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle text-center">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Title</th>
+                                    <th>Opening Status</th>
+                                    <th>Client</th>
+                                    <th>City</th>
+                                    <th>Closing Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <% if (jobs.length > 0) { %>
+                                    <% jobs.forEach((job, index) => { %>
+                                        <tr>
+                                            <td><%= index + 1 %></td>
+                                            <td class="searchable"><%= job.title %></td>
+                                            <td class="searchable">
+                                                <% if (job.jobOpenStatus) { %>
+                                                    <%= job.jobOpenStatus.name %>
+                                                <% } else { %>
+                                                    N/A
+                                                <% } %>
+                                            </td>
+                                            <td class="searchable">
+                                                <% if (job.client) { %>
+                                                    <%= job.client.clientName %>
+                                                <% } else { %>
+                                                    N/A
+                                                <% } %>
+                                            </td>
+                                            <td class="searchable"><%= job.address.city || 'N/A' %></td>
+                                            <td><%= job.applicationDeadline.toLocaleDateString() %></td>
+                                            <td>
+                                                <a href="/job/view/<%= job._id %>"
+                                                    class="btn btn-sm btn-outline-primary me-1" title="View">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="/job/edit/<%= job._id %>"
+                                                    class="btn btn-sm btn-outline-warning me-1" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form action="/job/delete/<%= job._id %>" method="POST"
+                                                    class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-danger"
+                                                        onclick="return confirm('Are you sure you want to delete this job?')">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="7" class="text-muted">No jobs found.</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination would go here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const tableBody = document.getElementById('tableBody');
+            const rows = tableBody.getElementsByTagName('tr');
+            const entriesPerPage = document.getElementById('entriesPerPage');
+            const noResultsRow = document.createElement('tr');
+            noResultsRow.innerHTML = '<td colspan="7" class="text-muted">No matching jobs found.</td>';
+            
+            // Search functionality
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = this.value.toLowerCase();
+                let hasMatches = false;
+                
+                // Remove previous highlights
+                document.querySelectorAll('.highlight').forEach(el => {
+                    el.classList.remove('highlight');
+                });
+                
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    const cells = row.getElementsByTagName('td');
+                    
+                    // Skip the "No jobs found" row if it exists
+                    if (cells.length === 1 && cells[0].colSpan === 7) {
+                        row.style.display = 'none';
+                        continue;
+                    }
+                    
+                    let shouldShow = false;
+                    
+                    // Check each searchable cell in the row
+                    for (let j = 0; j < cells.length - 1; j++) { // Skip action column
+                        if (cells[j].classList.contains('searchable')) {
+                            const cellText = cells[j].textContent.toLowerCase();
+                            if (cellText.includes(searchTerm)) {
+                                shouldShow = true;
+                                hasMatches = true;
+                                
+                                // Highlight matching text
+                                if (searchTerm) {
+                                    const regex = new RegExp(searchTerm, 'gi');
+                                    cells[j].innerHTML = cells[j].textContent.replace(regex, 
+                                        match => `<span class="highlight">${match}</span>`);
+                                }
+                            }
+                        }
+                    }
+                    
+                    row.style.display = shouldShow ? '' : 'none';
+                }
+                
+                // Show "No results" message if no matches
+                const existingNoResults = tableBody.querySelector('tr td[colspan="7"]');
+                if (!hasMatches && searchTerm) {
+                    if (!existingNoResults || !existingNoResults.textContent.includes('No matching')) {
+                        tableBody.appendChild(noResultsRow);
+                    }
+                } else {
+                    if (existingNoResults && existingNoResults.textContent.includes('No matching')) {
+                        existingNoResults.parentNode.remove();
+                    }
+                }
+            });
+            
+            // Entries per page functionality (client-side only)
+            entriesPerPage.addEventListener('change', function() {
+                const rowsPerPage = parseInt(this.value);
+                let visibleCount = 0;
+                
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    
+                    // Skip the "No jobs found" or "No matching" rows
+                    if (row.querySelector('td[colspan="7"]')) {
+                        continue;
+                    }
+                    
+                    if (row.style.display !== 'none') {
+                        visibleCount++;
+                        row.style.display = visibleCount <= rowsPerPage ? '' : 'none';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

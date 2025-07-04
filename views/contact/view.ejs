@@ -1,0 +1,107 @@
+<%- include('../layout') %>
+  <!DOCTYPE html>
+  <html>
+
+  <head>
+    <title>View Contacts</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+  </head>
+
+  <body>
+    <div class="main-content">
+      <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Contact List</h2>
+          <a href="/contact/add" class="btn btn-primary">Add New Contact</a>
+        </div>
+
+        <% if (contacts.length===0) { %>
+          <div class="alert alert-info">No contacts found. <a href="/contact/add">Add a contact</a></div>
+          <% } else { %>
+            <div class="card">
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table id="contactsTable" class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Client</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Job Title</th>
+                        <th>Assigned To</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% contacts.forEach(contact=> { %>
+                        <tr>
+                          <td>
+                            <strong>
+                              <%= contact.firstName %>
+                                <%= contact.lastName %>
+                            </strong>
+                          </td>
+                          <td>
+                            <% if (contact.client && contact.client._id) { %>
+                              <a href="/clients/view/<%= contact.client._id %>">
+                                <%= contact.client.clientName || 'Client' %>
+                              </a>
+                              <% } else { %>
+                                N/A
+                                <% } %>
+                          </td>
+                          <td>
+                            <%= contact.phoneNumber %>
+                          </td>
+                          <td>
+                            <%= contact.email %>
+                          </td>
+                          <td>
+                            <%= contact.jobTitle || 'N/A' %>
+                          </td>
+                          <td>
+                            <%= contact.assignedTo?.name || 'Unassigned' %>
+                          </td>
+                          <td>
+                            <div class="btn-group" role="group">
+                              <a href="/contact/view/<%= contact._id %>" class="btn btn-sm btn-info">View</a>
+                              <a href="/contact/edit/<%= contact._id %>" class="btn btn-sm btn-warning">Edit</a>
+                              <form action="/contact/delete/<%= contact._id %>" method="POST" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-danger"
+                                  onclick="return confirm('Are you sure?')">Delete</button>
+                              </form>
+                            </div>
+                          </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <% } %>
+      </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- Initialize DataTable -->
+    <script>
+      $(document).ready(function () {
+        $('#contactsTable').DataTable({
+          responsive: true,
+          columnDefs: [
+            { orderable: false, targets: [6] }
+          ]
+        });
+      });
+    </script>
+  </body>
+
+  </html>

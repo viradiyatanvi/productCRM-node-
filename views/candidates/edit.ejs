@@ -1,0 +1,689 @@
+<%- include('../layout') %>
+
+<div class="main-content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Edit Candidate</h2>
+    <a href="/candidates" class="btn btn-secondary">Back to List</a>
+  </div>
+
+  <form action="/candidates/edit/<%= candidate._id %>" method="POST" enctype="multipart/form-data">
+    <!-- Basic Information Section -->
+    <div class="form-section">
+      <h4>Basic Information</h4>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">First Name*</label>
+          <input type="text" class="form-control" name="firstName" value="<%= candidate.firstName %>" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Last Name*</label>
+          <input type="text" class="form-control" name="lastName" value="<%= candidate.lastName %>" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email*</label>
+          <input type="email" class="form-control" name="email" value="<%= candidate.email %>" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Phone*</label>
+          <input type="text" class="form-control" name="phone" value="<%= candidate.phone %>" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Fax</label>
+          <input type="text" class="form-control" name="fax" value="<%= candidate.fax || '' %>">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Website</label>
+          <input type="text" class="form-control" name="website" value="<%= candidate.website || '' %>">
+        </div>
+      </div>
+    </div>
+
+    <!-- Address Information -->
+    <div class="form-section">
+      <h4>Address Information</h4>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Street</label>
+          <input type="text" class="form-control" name="street" value="<%= candidate.street || '' %>">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">City</label>
+          <input type="text" class="form-control" name="city" value="<%= candidate.city || '' %>">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">State</label>
+          <input type="text" class="form-control" name="state" value="<%= candidate.state || '' %>">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Postal Code</label>
+          <input type="text" class="form-control" name="code" value="<%= candidate.code || '' %>">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Country</label>
+          <input type="text" class="form-control" name="country" value="<%= candidate.country || '' %>">
+        </div>
+      </div>
+    </div>
+
+    <!-- Professional Details -->
+    <div class="form-section">
+      <h4>Professional Details</h4>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Total Experience (Years)</label>
+          <input type="text" class="form-control" name="totalExperience" value="<%= candidate.totalExperience || '' %>">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Education Level</label>
+          <input type="text" class="form-control" name="educationLevel" value="<%= candidate.educationLevel || '' %>">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Expected Salary</label>
+          <input type="text" class="form-control" name="expectedSalary" value="<%= candidate.expectedSalary || '' %>">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Skills</label>
+          <textarea class="form-control" name="skills" rows="3"><%= candidate.skills || '' %></textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Additional Information</label>
+          <textarea class="form-control" name="additionalInfo" rows="3"><%= candidate.additionalInfo || '' %></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Education Information -->
+    <div class="form-section">
+      <h4>Education Information</h4>
+      <div id="education-container">
+        <% if (candidate.education && candidate.education.length > 0) { %>
+          <% candidate.education.forEach((edu, index) => { %>
+            <div class="education-entry mb-3 p-3 border rounded">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Institute*</label>
+                  <input type="text" class="form-control" name="education[<%= index %>][institute]" value="<%= edu.institute %>" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Major</label>
+                  <input type="text" class="form-control" name="education[<%= index %>][major]" value="<%= edu.major %>">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Start Month</label>
+                  <select class="form-select" name="education[<%= index %>][startMonth]">
+                    <option value="">Select Month</option>
+                    <% months.forEach(month => { %>
+                      <option value="<%= month %>" <%= edu.startMonth === month ? 'selected' : '' %>><%= month %></option>
+                    <% }) %>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Start Year</label>
+                  <select class="form-select" name="education[<%= index %>][startYear]">
+                    <option value="">Select Year</option>
+                    <% for(let year = currentYear; year >= 1970; year--) { %>
+                      <option value="<%= year %>" <%= edu.startYear === year.toString() ? 'selected' : '' %>><%= year %></option>
+                    <% } %>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">End Month</label>
+                  <select class="form-select" name="education[<%= index %>][endMonth]">
+                    <option value="">Select Month</option>
+                    <% months.forEach(month => { %>
+                      <option value="<%= month %>" <%= edu.endMonth === month ? 'selected' : '' %>><%= month %></option>
+                    <% }) %>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">End Year</label>
+                  <select class="form-select" name="education[<%= index %>][endYear]">
+                    <option value="">Select Year</option>
+                    <% for(let year = currentYear; year >= 1970; year--) { %>
+                      <option value="<%= year %>" <%= edu.endYear === year.toString() ? 'selected' : '' %>><%= year %></option>
+                    <% } %>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="education[<%= index %>][currentlyStudying]" id="currentlyStudying<%= index %>" <%= edu.currentlyStudying ? 'checked' : '' %>>
+                    <label class="form-check-label" for="currentlyStudying<%= index %>">Currently Studying Here</label>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="btn btn-sm btn-danger mt-2 remove-education">Remove</button>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="education-entry mb-3 p-3 border rounded">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Institute*</label>
+                <input type="text" class="form-control" name="education[0][institute]" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Major</label>
+                <input type="text" class="form-control" name="education[0][major]">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Start Month</label>
+                <select class="form-select" name="education[0][startMonth]">
+                  <option value="">Select Month</option>
+                  <% months.forEach(month => { %>
+                    <option value="<%= month %>"><%= month %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Start Year</label>
+                <select class="form-select" name="education[0][startYear]">
+                  <option value="">Select Year</option>
+                  <% for(let year = currentYear; year >= 1970; year--) { %>
+                    <option value="<%= year %>"><%= year %></option>
+                  <% } %>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">End Month</label>
+                <select class="form-select" name="education[0][endMonth]">
+                  <option value="">Select Month</option>
+                  <% months.forEach(month => { %>
+                    <option value="<%= month %>"><%= month %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">End Year</label>
+                <select class="form-select" name="education[0][endYear]">
+                  <option value="">Select Year</option>
+                  <% for(let year = currentYear; year >= 1970; year--) { %>
+                    <option value="<%= year %>"><%= year %></option>
+                  <% } %>
+                </select>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="education[0][currentlyStudying]" id="currentlyStudying0">
+                  <label class="form-check-label" for="currentlyStudying0">Currently Studying Here</label>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-danger mt-2 remove-education">Remove</button>
+          </div>
+        <% } %>
+      </div>
+      <button type="button" id="add-education" class="btn btn-sm text-white" style="background-color: #343a40;">+ Add Education</button>
+    </div>
+
+    <!-- Work Experiences -->
+    <div class="form-section">
+      <h4>Work Experiences</h4>
+      <div id="work-experience-container">
+        <% if (candidate.workExperiences && candidate.workExperiences.length > 0) { %>
+          <% candidate.workExperiences.forEach((exp, index) => { %>
+            <div class="work-experience-entry mb-3 p-3 border rounded">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label">Job Title*</label>
+                  <input type="text" class="form-control" name="workExperiences[<%= index %>][jobTitle]" value="<%= exp.jobTitle %>" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Category*</label>
+                  <input type="text" class="form-control" name="workExperiences[<%= index %>][category]" value="<%= exp.category %>" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Category Name</label>
+                  <input type="text" class="form-control" name="workExperiences[<%= index %>][categoryName]" value="<%= exp.categoryName %>">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Start Month</label>
+                  <select class="form-select" name="workExperiences[<%= index %>][startMonth]">
+                    <option value="">Select Month</option>
+                    <% months.forEach(month => { %>
+                      <option value="<%= month %>" <%= exp.startMonth === month ? 'selected' : '' %>><%= month %></option>
+                    <% }) %>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Start Year</label>
+                  <select class="form-select" name="workExperiences[<%= index %>][startYear]">
+                    <option value="">Select Year</option>
+                    <% for(let year = currentYear; year >= 1970; year--) { %>
+                      <option value="<%= year %>" <%= exp.startYear === year.toString() ? 'selected' : '' %>><%= year %></option>
+                    <% } %>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">End Month</label>
+                  <select class="form-select" name="workExperiences[<%= index %>][endMonth]">
+                    <option value="">Select Month</option>
+                    <% months.forEach(month => { %>
+                      <option value="<%= month %>" <%= exp.endMonth === month ? 'selected' : '' %>><%= month %></option>
+                    <% }) %>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">End Year</label>
+                  <select class="form-select" name="workExperiences[<%= index %>][endYear]">
+                    <option value="">Select Year</option>
+                    <% for(let year = currentYear; year >= 1970; year--) { %>
+                      <option value="<%= year %>" <%= exp.endYear === year.toString() ? 'selected' : '' %>><%= year %></option>
+                    <% } %>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="workExperiences[<%= index %>][currentlyWorking]" id="currentlyWorking<%= index %>" <%= exp.currentlyWorking ? 'checked' : '' %>>
+                    <label class="form-check-label" for="currentlyWorking<%= index %>">Currently Working Here</label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Description</label>
+                  <textarea class="form-control" name="workExperiences[<%= index %>][description]" rows="2"><%= exp.description %></textarea>
+                </div>
+              </div>
+              <button type="button" class="btn btn-sm btn-danger mt-2 remove-work-experience">Remove</button>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="work-experience-entry mb-3 p-3 border rounded">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Job Title*</label>
+                <input type="text" class="form-control" name="workExperiences[0][jobTitle]" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Category*</label>
+                <input type="text" class="form-control" name="workExperiences[0][category]" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Category Name</label>
+                <input type="text" class="form-control" name="workExperiences[0][categoryName]">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Start Month</label>
+                <select class="form-select" name="workExperiences[0][startMonth]">
+                  <option value="">Select Month</option>
+                  <% months.forEach(month => { %>
+                    <option value="<%= month %>"><%= month %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Start Year</label>
+                <select class="form-select" name="workExperiences[0][startYear]">
+                  <option value="">Select Year</option>
+                  <% for(let year = currentYear; year >= 1970; year--) { %>
+                    <option value="<%= year %>"><%= year %></option>
+                  <% } %>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">End Month</label>
+                <select class="form-select" name="workExperiences[0][endMonth]">
+                  <option value="">Select Month</option>
+                  <% months.forEach(month => { %>
+                    <option value="<%= month %>"><%= month %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">End Year</label>
+                <select class="form-select" name="workExperiences[0][endYear]">
+                  <option value="">Select Year</option>
+                  <% for(let year = currentYear; year >= 1970; year--) { %>
+                    <option value="<%= year %>"><%= year %></option>
+                  <% } %>
+                </select>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="workExperiences[0][currentlyWorking]" id="currentlyWorking0">
+                  <label class="form-check-label" for="currentlyWorking0">Currently Working Here</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" name="workExperiences[0][description]" rows="2"></textarea>
+              </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-danger mt-2 remove-work-experience">Remove</button>
+          </div>
+        <% } %>
+      </div>
+      <button type="button" id="add-work-experience" class="btn btn-sm text-white" style="background-color: #343a40;">+ Add Work Experience</button>
+    </div>
+
+    <!-- Summary -->
+    <div class="form-section">
+      <h4>Summary</h4>
+      <div id="summary-container">
+        <% if (candidate.summaryPoints && candidate.summaryPoints.length > 0) { %>
+          <% candidate.summaryPoints.forEach((point, index) => { %>
+            <div class="input-group mb-2">
+              <input type="text" class="form-control" name="summaryPoints[]" value="<%= point %>" placeholder="Summary point">
+              <button type="button" class="btn btn-danger remove-summary">×</button>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="input-group mb-2">
+            <input type="text" class="form-control" name="summaryPoints[]" placeholder="Summary point">
+            <button type="button" class="btn btn-danger remove-summary">×</button>
+          </div>
+        <% } %>
+      </div>
+      <button type="button" id="add-summary" class="btn btn-sm text-white" style="background-color: #343a40;">+ Add Summary Point</button>
+    </div>
+
+    <!-- Social & Other Information -->
+    <div class="form-section">
+      <h4>Other Information</h4>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Status</label>
+          <select class="form-select" name="status">
+            <% statuses.forEach(stat => { %>
+              <option value="<%= stat._id %>" <%= candidate.status && candidate.status._id.toString() === stat._id.toString() ? 'selected' : '' %>>
+                <%= stat.name %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Source</label>
+          <select class="form-select" name="source">
+            <% sources.forEach(src => { %>
+              <option value="<%= src._id %>" <%= candidate.source && candidate.source._id.toString() === src._id.toString() ? 'selected' : '' %>>
+                <%= src.name %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Twitter</label>
+          <input type="text" class="form-control" name="twitter" value="<%= candidate.twitter || '' %>">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Skype</label>
+          <input type="text" class="form-control" name="skype" value="<%= candidate.skype || '' %>">
+        </div>
+      </div>
+    </div>
+
+    <!-- Attachment Information -->
+    <div class="form-section">
+      <h4>Attachment Information</h4>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Profile Image</label>
+          <% if (candidate.profileImage) { %>
+            <div class="mb-2">
+              <img src="/uploads/<%= candidate.profileImage %>" alt="Profile Image" style="max-width: 100px;">
+              <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" name="removeProfileImage" id="removeProfileImage">
+                <label class="form-check-label" for="removeProfileImage">Remove current image</label>
+              </div>
+            </div>
+          <% } %>
+          <input type="file" class="form-control" name="profileImage" accept="image/*">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Resume</label>
+          <% if (candidate.resume) { %>
+            <div class="mb-2">
+              <a href="/uploads/<%= candidate.resume %>" target="_blank">View current resume</a>
+              <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" name="removeResume" id="removeResume">
+                <label class="form-check-label" for="removeResume">Remove current resume</label>
+              </div>
+            </div>
+          <% } %>
+          <input type="file" class="form-control" name="resume" accept=".pdf,.doc,.docx">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Cover Letter</label>
+          <% if (candidate.coverLetter) { %>
+            <div class="mb-2">
+              <a href="/uploads/<%= candidate.coverLetter %>" target="_blank">View current cover letter</a>
+              <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" name="removeCoverLetter" id="removeCoverLetter">
+                <label class="form-check-label" for="removeCoverLetter">Remove current cover letter</label>
+              </div>
+            </div>
+          <% } %>
+          <input type="file" class="form-control" name="coverLetter" accept=".pdf,.doc,.docx">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Contract</label>
+          <% if (candidate.contract) { %>
+            <div class="mb-2">
+              <a href="/uploads/<%= candidate.contract %>" target="_blank">View current contract</a>
+              <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" name="removeContract" id="removeContract">
+                <label class="form-check-label" for="removeContract">Remove current contract</label>
+              </div>
+            </div>
+          <% } %>
+          <input type="file" class="form-control" name="contract" accept=".pdf,.doc,.docx">
+        </div>
+      </div>
+    </div>
+
+    <div class="text-end mt-4">
+      <button type="submit" class="btn text-white px-4" style="background-color: #343a40;">Update Candidate</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Education
+  document.getElementById('add-education').addEventListener('click', function() {
+    const container = document.getElementById('education-container');
+    const index = container.children.length;
+    const template = `
+      <div class="education-entry mb-3 p-3 border rounded">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Institute*</label>
+            <input type="text" class="form-control" name="education[${index}][institute]" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Major</label>
+            <input type="text" class="form-control" name="education[${index}][major]">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Start Month</label>
+            <select class="form-select" name="education[${index}][startMonth]">
+              <option value="">Select Month</option>
+              <% months.forEach(month => { %>
+                <option value="<%= month %>"><%= month %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Start Year</label>
+            <select class="form-select" name="education[${index}][startYear]">
+              <option value="">Select Year</option>
+              <% for(let year = currentYear; year >= 1970; year--) { %>
+                <option value="<%= year %>"><%= year %></option>
+              <% } %>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">End Month</label>
+            <select class="form-select" name="education[${index}][endMonth]">
+              <option value="">Select Month</option>
+              <% months.forEach(month => { %>
+                <option value="<%= month %>"><%= month %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">End Year</label>
+            <select class="form-select" name="education[${index}][endYear]">
+              <option value="">Select Year</option>
+              <% for(let year = currentYear; year >= 1970; year--) { %>
+                <option value="<%= year %>"><%= year %></option>
+              <% } %>
+            </select>
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="education[${index}][currentlyStudying]" id="currentlyStudying${index}">
+              <label class="form-check-label" for="currentlyStudying${index}">Currently Studying Here</label>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-danger mt-2 remove-education">Remove</button>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', template);
+  });
+
+  // Work Experience
+  document.getElementById('add-work-experience').addEventListener('click', function() {
+    const container = document.getElementById('work-experience-container');
+    const index = container.children.length;
+    const template = `
+      <div class="work-experience-entry mb-3 p-3 border rounded">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Job Title*</label>
+            <input type="text" class="form-control" name="workExperiences[${index}][jobTitle]" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Category*</label>
+            <input type="text" class="form-control" name="workExperiences[${index}][category]" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Category Name</label>
+            <input type="text" class="form-control" name="workExperiences[${index}][categoryName]">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Start Month</label>
+            <select class="form-select" name="workExperiences[${index}][startMonth]">
+              <option value="">Select Month</option>
+              <% months.forEach(month => { %>
+                <option value="<%= month %>"><%= month %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Start Year</label>
+            <select class="form-select" name="workExperiences[${index}][startYear]">
+              <option value="">Select Year</option>
+              <% for(let year = currentYear; year >= 1970; year--) { %>
+                <option value="<%= year %>"><%= year %></option>
+              <% } %>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">End Month</label>
+            <select class="form-select" name="workExperiences[${index}][endMonth]">
+              <option value="">Select Month</option>
+              <% months.forEach(month => { %>
+                <option value="<%= month %>"><%= month %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">End Year</label>
+            <select class="form-select" name="workExperiences[${index}][endYear]">
+              <option value="">Select Year</option>
+              <% for(let year = currentYear; year >= 1970; year--) { %>
+                <option value="<%= year %>"><%= year %></option>
+              <% } %>
+            </select>
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="workExperiences[${index}][currentlyWorking]" id="currentlyWorking${index}">
+              <label class="form-check-label" for="currentlyWorking${index}">Currently Working Here</label>
+            </div>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" name="workExperiences[${index}][description]" rows="2"></textarea>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-danger mt-2 remove-work-experience">Remove</button>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', template);
+  });
+
+  // Summary
+  document.getElementById('add-summary').addEventListener('click', function() {
+    const container = document.getElementById('summary-container');
+    const template = `
+      <div class="input-group mb-2">
+        <input type="text" class="form-control" name="summaryPoints[]" placeholder="Summary point">
+        <button type="button" class="btn btn-danger remove-summary">×</button>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', template);
+  });
+
+  // Event delegation for remove buttons
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-education')) {
+      e.target.closest('.education-entry').remove();
+    }
+    if (e.target.classList.contains('remove-work-experience')) {
+      e.target.closest('.work-experience-entry').remove();
+    }
+    if (e.target.classList.contains('remove-summary')) {
+      e.target.closest('.input-group').remove();
+    }
+  });
+</script>
+<script>
+  function toggleEducationFields() {
+    document.querySelectorAll('.education-entry').forEach((entry, index) => {
+      const checkbox = entry.querySelector(`#currentlyStudying${index}`);
+      const endMonth = entry.querySelector(`select[name="education[${index}][endMonth]"]`);
+      const endYear = entry.querySelector(`select[name="education[${index}][endYear]"]`);
+
+      if (checkbox && endMonth && endYear) {
+        const toggleFields = () => {
+          const checked = checkbox.checked;
+          endMonth.disabled = checked;
+          endYear.disabled = checked;
+        };
+        checkbox.addEventListener('change', toggleFields);
+        toggleFields(); // Set initial state
+      }
+    });
+  }
+
+  function toggleWorkFields() {
+    document.querySelectorAll('.work-experience-entry').forEach((entry, index) => {
+      const checkbox = entry.querySelector(`#currentlyWorking${index}`);
+      const endMonth = entry.querySelector(`select[name="workExperiences[${index}][endMonth]"]`);
+      const endYear = entry.querySelector(`select[name="workExperiences[${index}][endYear]"]`);
+
+      if (checkbox && endMonth && endYear) {
+        const toggleFields = () => {
+          const checked = checkbox.checked;
+          endMonth.disabled = checked;
+          endYear.disabled = checked;
+        };
+        checkbox.addEventListener('change', toggleFields);
+        toggleFields(); 
+      }
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    toggleEducationFields();
+    toggleWorkFields();
+
+    document.getElementById('add-education')?.addEventListener('click', () => {
+      setTimeout(toggleEducationFields, 100);
+    });
+
+    document.getElementById('add-work-experience')?.addEventListener('click', () => {
+      setTimeout(toggleWorkFields, 100);
+    });
+  });
+</script>

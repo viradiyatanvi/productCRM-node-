@@ -1,0 +1,60 @@
+<%- include('../layout') %>
+    <!DOCTYPE html>
+    <html>
+
+    <head>
+        <title>
+            <%= candidate ? 'Edit' : 'Add' %> Candidate
+        </title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    </head>
+
+    <body>
+        <div class="main-content">
+            <div class="container mt-5">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header <%= candidate ? 'bg-secondary' : 'bg-secondary' %> text-white">
+                        <h4 class="mb-0">
+                            <%= candidate ? 'Edit Candidate Status' : 'Add Candidate Status' %>
+                        </h4>
+                    </div>
+
+                    <div class="card-body">
+                        <form
+                            action="<%= candidate ? '/candidate/status/edit/' + candidate._id : '/candidate/status/add' %>"
+                            method="POST">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Status Name</label>
+                                <input type="text" class="form-control" id="name" name="name"
+                                    value="<%= candidate ? candidate.name : '' %>"
+                                    placeholder="Enter status (e.g., New, Shortlisted)" required>
+                            </div>
+
+                            <% if (candidate) { %>
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Current Status</label>
+                                    <select name="status" id="status" class="form-select">
+                                        <option value="Active" <%=candidate.status==='Active' ? 'selected' : '' %>
+                                            >Active</option>
+                                        <option value="Inactive" <%=candidate.status==='Inactive' ? 'selected' : '' %>
+                                            >Inactive</option>
+                                    </select>
+                                </div>
+                                <% } %>
+
+                                    <button type="submit" class="btn text-white" style="background-color: #343a40;">
+                                        <i class="fas fa-save me-1"></i>
+                                        <%= candidate ? 'Update' : 'Add' %> Status
+                                    </button>
+                                    <a href="/candidate/status" class="btn btn-secondary ms-2">
+                                        <i class="fas fa-arrow-left me-1"></i> Back to List
+                                    </a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    </html>

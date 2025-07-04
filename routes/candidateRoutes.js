@@ -1,46 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const candidateController = require('../controllers/candidateController');
-const {isAuthenticated}=require('../middleware/auth');
-const Candidate=require('../controllers/candidateController');
-const Contact = require('../models/Contact');
+const upload = require('../middleware/upload/candidate');
+const { isAuthenticated } = require('../middleware/auth');
 
-// Show Add Form
+// Candidate routes
+router.get('/', isAuthenticated, candidateController.list);
+router.get('/add', isAuthenticated, candidateController.addForm);
+router.post('/add', upload.fields([
+  { name: 'profileImage', maxCount: 1 },
+  { name: 'resume', maxCount: 1 },
+  { name: 'coverLetter', maxCount: 1 },
+  { name: 'contract', maxCount: 1 }
+]), candidateController.create);
+router.get('/edit/:id', isAuthenticated, candidateController.editForm);
+router.post('/edit/:id', isAuthenticated,upload.fields([
+  { name: 'profileImage', maxCount: 1 },
+  { name: 'resume', maxCount: 1 },  
+  { name: 'coverLetter', maxCount: 1 },
+  { name: 'contract', maxCount: 1 }
+]), candidateController.update);
+router.get('/delete/:id', candidateController.delete);
+router.get('/view/:id', isAuthenticated, candidateController.view);
 
-router.get('/add', isAuthenticated, async (req, res) => {
-  try {
-    const contacts = await Contact.find(); 
-    res.render('candidate/add', {
-      user: req.user || req.session.user,
-      contacts 
-    });
-  } catch (err) {
-    console.error("Fetch contacts error:", err);
-    res.status(500).send("Error loading form");
-  }
-});
-
-// Handle Add Submission
-router.post('/add', isAuthenticated, async (req, res) => {
-  try {
-    const data = req.body;
-    const Candidate = require('../models/Candidate');
-    const candidate = new Candidate(data);
-    await candidate.save();
-    res.redirect('/candidate');
-  } catch (err) {
-    console.error("Add Error:", err);
-    res.status(500).send('Error adding candidate');
-  }
-});
-
-
-router.get('/',isAuthenticated,candidateController.getAllCandidates);
-router.post('/quick-create',isAuthenticated,candidateController.quickCreateFromContact);
-
-router.get('/edit/:id',isAuthenticated,candidateController.getCandidateJson);
-router.post('/edit/:id',isAuthenticated,candidateController.updateCandidate);
-
-router.delete('/delete/:id',isAuthenticated,candidateController.deleteCandidate);
+router.get('/contact/:id', isAuthenticated, candidateController.getContactDetails);
 
 module.exports = router;
