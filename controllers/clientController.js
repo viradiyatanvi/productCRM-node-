@@ -1,4 +1,3 @@
-// controllers/clientController.js
 const Client = require('../models/Client');
 const Industry = require('../models/Industry');
 const ClientSource = require('../models/ClientSource');
@@ -8,7 +7,7 @@ const path = require('path');
 exports.index = async (req, res) => {
     try {
         const clients = await Client.find()
-            .populate('industry')
+            .populate('industry') 
             .populate('clientSource')
             .sort({ createdAt: -1 });
 
@@ -41,13 +40,23 @@ exports.create = async (req, res) => {
 exports.store = async (req, res) => {
     try {
         const {
-            clientName, fax, telegram, industry, about,
-            contactNumber, website, server, clientSource,
-            billingStreet, billingState, billingCountry,
-            billingCity, billingCode, shippingStreet,
-            shippingState, shippingCity, shippingCode
+            clientName, companyName, email, contactNumber, alternativeNumber,
+            industry, about, website, server, clientSource,
+            branchAddresses
         } = req.body;
-
+        const processedBranches = branchAddresses.map(branch => ({
+            branchName: branch.branchName,
+            branchNumber: branch.branchNumber,
+            street: branch.street,
+            city: branch.city,
+            state: branch.state,
+            country: branch.country,
+            postalCode: branch.postalCode,
+            isPrimary: branch.isPrimary === 'on'
+        }));
+        if (!processedBranches.some(branch => branch.isPrimary)) {
+            processedBranches[0].isPrimary = true;
+        }
         const attachments = [];
         if (req.files) {
             req.files.forEach(file => {
@@ -62,23 +71,16 @@ exports.store = async (req, res) => {
 
         const newClient = new Client({
             clientName,
-            fax,
-            telegram,
+            companyName,
+            email,
+            contactNumber,
+            alternativeNumber,
             industry,
             about,
-            contactNumber,
             website,
             server,
             clientSource,
-            billingStreet,
-            billingState,
-            billingCountry,
-            billingCity,
-            billingCode,
-            shippingStreet,
-            shippingState,
-            shippingCity,
-            shippingCode,
+            branchAddresses: processedBranches,
             attachments
         });
 
@@ -89,6 +91,7 @@ exports.store = async (req, res) => {
         if (err.name === 'ValidationError') {
             req.flash('error_msg', Object.values(err.errors).map(val => val.message));
         } else {
+            console.error(err);
             req.flash('error_msg', 'Error creating client');
         }
         res.redirect('/clients/create');
@@ -101,13 +104,20 @@ exports.view = async (req, res) => {
             .populate('industry')
             .populate('clientSource');
 
+        if (!client) {
+            req.flash('error_msg', 'Client not found');
+            return res.redirect('/clients');
+        }
+
         res.render('clients/view', {
+            title: 'Client Details',
             client,
             path: require('path')
         });
     } catch (err) {
         console.error(err);
-        res.status(500).send('Server Error');
+        req.flash('error_msg', 'Error loading client details');
+        res.redirect('/clients');
     }
 };
 
@@ -137,11 +147,9 @@ exports.edit = async (req, res) => {
 exports.update = async (req, res) => {
     try {
         const {
-            clientName, fax, telegram, industry, about,
-            contactNumber, website, server, clientSource,
-            billingStreet, billingState, billingCountry,
-            billingCity, billingCode, shippingStreet,
-            shippingState, shippingCity, shippingCode
+            clientName, companyName, email, contactNumber, alternativeNumber,
+            industry, about, website, server, clientSource,
+            branchAddresses
         } = req.body;
 
         const client = await Client.findById(req.params.id);
@@ -149,8 +157,19 @@ exports.update = async (req, res) => {
             req.flash('error_msg', 'Client not found');
             return res.redirect('/clients');
         }
-
-        // Handle new file uploads
+        const processedBranches = branchAddresses.map(branch => ({
+            branchName: branch.branchName,
+            branchNumber: branch.branchNumber,
+            street: branch.street,
+            city: branch.city,
+            state: branch.state,
+            country: branch.country,
+            postalCode: branch.postalCode,
+            isPrimary: branch.isPrimary === 'on'
+        }));
+        if (!processedBranches.some(branch => branch.isPrimary)) {
+            processedBranches[0].isPrimary = true;
+        }
         if (req.files && req.files.length > 0) {
             req.files.forEach(file => {
                 client.attachments.push({
@@ -159,34 +178,27 @@ exports.update = async (req, res) => {
                 });
             });
         }
-
-        // Update client fields
         client.clientName = clientName;
-        client.fax = fax;
-        client.telegram = telegram;
+        client.companyName = companyName;
+        client.email = email;
+        client.contactNumber = contactNumber;
+        client.alternativeNumber = alternativeNumber;
         client.industry = industry;
         client.about = about;
-        client.contactNumber = contactNumber;
         client.website = website;
         client.server = server;
         client.clientSource = clientSource;
-        client.billingStreet = billingStreet;
-        client.billingState = billingState;
-        client.billingCountry = billingCountry;
-        client.billingCity = billingCity;
-        client.billingCode = billingCode;
-        client.shippingStreet = shippingStreet;
-        client.shippingState = shippingState;
-        client.shippingCity = shippingCity;
-        client.shippingCode = shippingCode;
+        client.branchAddresses = processedBranches;
 
         await client.save();
         req.flash('success_msg', 'Client updated successfully');
-        res.redirect(`/clients/${client._id}`);
+        // res.redirect(`/clients/${client._id}`);
+        res.redirect('/clients');
     } catch (err) {
         if (err.name === 'ValidationError') {
             req.flash('error_msg', Object.values(err.errors).map(val => val.message));
         } else {
+            console.error(err);
             req.flash('error_msg', 'Error updating client');
         }
         res.redirect(`/clients/${req.params.id}/edit`);
@@ -206,7 +218,7 @@ exports.delete = async (req, res) => {
         // Delete associated files
         if (client.attachments && client.attachments.length > 0) {
             client.attachments.forEach(attachment => {
-                const filePath = path.join(__dirname, '../public/uploads', attachment.filename);
+                const filePath = path.join(__dirname, '../../uploads/candidates', attachment.filename);
                 if (fs.existsSync(filePath)) {
                     fs.unlinkSync(filePath);
                 }

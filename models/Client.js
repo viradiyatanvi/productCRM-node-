@@ -1,63 +1,37 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const clientSchema = new mongoose.Schema({
-  clientName: {
-    type: String,
-    required: true
-  },
-  fax: String,
-  telegram: {
-    type: String,
-    required: true
-  },
-  industry: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Industry',
-    required: true
-  },
+const attachmentSchema = new Schema({
+  filename: String,
+  originalname: String,
+  mimetype: String,
+  size: Number
+});
+
+const branchAddressSchema = new Schema({
+  branchName: String,
+  branchNumber: String,
+  street: String,
+  city: String,
+  state: String,
+  country: String,
+  postalCode: String,
+  isPrimary: { type: Boolean, default: false }
+});
+
+const clientSchema = new Schema({
+  clientName: { type: String, required: true },
+  companyName: { type: String, required: true },
+  email: String,
+  contactNumber: { type: String, required: true },
+  alternativeNumber: String,
+  industry: { type: Schema.Types.ObjectId, ref: 'Industry', required: true },
   about: String,
-  contactNumber: {
-    type: String,
-    required: true
-  },
   website: String,
-  server: {
-    type: String,
-    required: true
-  },
-  clientSource: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'ClientSource',
-    required: true
-  },
-  billingStreet: {
-    type: String,
-    required: true
-  },
-  billingState: {
-    type: String,
-    required: true
-  },
-  billingCountry: {
-    type: String,
-    required: true
-  },
-  billingCity: {
-    type: String,
-    required: true
-  },
-  billingCode: {
-    type: String,
-    required: true
-  },
-  shippingStreet: String,
-  shippingState: String,
-  shippingCity: String,
-  shippingCode: String,
-  attachments: [{
-    filename: String,
-    path: String
-  }],
+  server: { type: String, required: true },
+  clientSource: { type: Schema.Types.ObjectId, ref: 'ClientSource', required: true },
+  branchAddresses: [branchAddressSchema],
+  attachments: [attachmentSchema],
   status: {
     type: String,
     enum: ['Active', 'Inactive'],

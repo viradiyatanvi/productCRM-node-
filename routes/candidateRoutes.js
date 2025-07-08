@@ -3,6 +3,7 @@ const router = express.Router();
 const candidateController = require('../controllers/candidateController');
 const upload = require('../middleware/upload/candidate');
 const { isAuthenticated } = require('../middleware/auth');
+const { authenticate } = require('passport');
 
 // Candidate routes
 router.get('/', isAuthenticated, candidateController.list);
@@ -20,7 +21,7 @@ router.post('/edit/:id', isAuthenticated,upload.fields([
   { name: 'coverLetter', maxCount: 1 },
   { name: 'contract', maxCount: 1 }
 ]), candidateController.update);
-router.get('/delete/:id', candidateController.delete);
+router.get('/delete/:id',authenticate , candidateController.delete);
 router.get('/view/:id', isAuthenticated, candidateController.view);
 
 router.get('/contact/:id', isAuthenticated, candidateController.getContactDetails);

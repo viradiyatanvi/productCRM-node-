@@ -5,7 +5,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Add New Client</title>
+    <style>
+        .branch-address-container {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .remove-branch {
+            float: right;
+            cursor: pointer;
+            color: red;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 
@@ -15,7 +30,7 @@
       <h2>Client Information</h2>
     </div>
     <div class="card-body">
-      <form action="/clients" method="POST" enctype="multipart/form-data">
+      <form action="/clients" method="POST" enctype="multipart/form-data" id="clientForm">
         
         <div class="row mb-3">
           <div class="col-md-6">
@@ -23,29 +38,13 @@
             <input type="text" class="form-control" name="clientName" required>
           </div>
           <div class="col-md-6">
-            <label class="form-label">Fax</label>
-            <input type="text" class="form-control" name="fax">
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Telegram*</label>
-            <input type="text" class="form-control" name="telegram" required>
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" name="email">
           </div>
           <div class="col-md-6">
-            <label class="form-label">Select Industry*</label>
-            <select class="form-select" name="industry" required>
-              <% industries.forEach(industry => { %>
-                <option value="<%= industry._id %>"><%= industry.name %></option>
-              <% }) %>
-            </select>
+            <label class="form-label">Companys Name*</label>
+            <input type="text" class="form-control" name="companyName" required>
           </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">About</label>
-          <textarea class="form-control" name="about" rows="3"></textarea>
         </div>
 
         <div class="row mb-3">
@@ -54,9 +53,29 @@
             <input type="text" class="form-control" name="contactNumber" required>
           </div>
           <div class="col-md-6">
+            <label class="form-label">Alternative Number</label>
+            <input type="text" class="form-control" name="alternativeNumber">
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Select Industry*</label>
+            <select class="form-select" name="industry" required>
+              <% industries.forEach(industry => { %>
+                <option value="<%= industry._id %>"><%= industry.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-md-6">
             <label class="form-label">Website</label>
             <input type="url" class="form-control" name="website">
           </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">About</label>
+          <textarea class="form-control" name="about" rows="3"></textarea>
         </div>
 
         <div class="row mb-3">
@@ -74,58 +93,61 @@
           </div>
         </div>
 
-        <h4 class="mt-4">Billing Address Information</h4>
-        
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Billing Street*</label>
-            <input type="text" class="form-control" name="billingStreet" required>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Billing State*</label>
-            <input type="text" class="form-control" name="billingState" required>
+        <h4 class="mt-4">Branch Addresses</h4>
+        <div id="branchAddressesContainer">
+          <!-- First branch address will be added here by default -->
+          <div class="branch-address-container">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Branch Name*</label>
+                <input type="text" class="form-control" name="branchAddresses[0][branchName]" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Branch Number*</label>
+                <input type="text" class="form-control" name="branchAddresses[0][branchNumber]" required>
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Street*</label>
+                <input type="text" class="form-control" name="branchAddresses[0][street]" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">City*</label>
+                <input type="text" class="form-control" name="branchAddresses[0][city]" required>
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">State*</label>
+                <input type="text" class="form-control" name="branchAddresses[0][state]" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Country*</label>
+                <input type="text" class="form-control" name="branchAddresses[0][country]" required>
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Postal Code*</label>
+                <input type="text" class="form-control" name="branchAddresses[0][postalCode]" required>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mt-4 pt-2">
+                  <input class="form-check-input" type="checkbox" name="branchAddresses[0][isPrimary]" id="isPrimary0">
+                  <label class="form-check-label" for="isPrimary0">
+                    Primary Branch
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Billing Country*</label>
-            <input type="text" class="form-control" name="billingCountry" required>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Billing City*</label>
-            <input type="text" class="form-control" name="billingCity" required>
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Billing Code*</label>
-          <input type="text" class="form-control" name="billingCode" required>
-        </div>
-
-        <h4 class="mt-4">Shipping Address Information</h4>
-        
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Shipping Street</label>
-            <input type="text" class="form-control" name="shippingStreet">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Shipping State</label>
-            <input type="text" class="form-control" name="shippingState">
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Shipping City</label>
-            <input type="text" class="form-control" name="shippingCity">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Shipping Code</label>
-            <input type="text" class="form-control" name="shippingCode">
-          </div>
-        </div>
+        <button type="button" class="btn btn-secondary mb-3" id="addBranchBtn">+</button>
 
         <h4 class="mt-4">Attachment Information</h4>
         
@@ -142,5 +164,81 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    let branchCount = 1;
+    
+    // Add new branch address
+    document.getElementById('addBranchBtn').addEventListener('click', function() {
+      const container = document.getElementById('branchAddressesContainer');
+      const newBranch = document.createElement('div');
+      newBranch.className = 'branch-address-container';
+      newBranch.innerHTML = `
+        <span class="remove-branch" onclick="this.parentElement.remove()">×</span>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Branch Name*</label>
+            <input type="text" class="form-control" name="branchAddresses[${branchCount}][branchName]" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Branch Number*</label>
+            <input type="text" class="form-control" name="branchAddresses[${branchCount}][branchNumber]" required>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Street*</label>
+            <input type="text" class="form-control" name="branchAddresses[${branchCount}][street]" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">City*</label>
+            <input type="text" class="form-control" name="branchAddresses[${branchCount}][city]" required>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">State*</label>
+            <input type="text" class="form-control" name="branchAddresses[${branchCount}][state]" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Country*</label>
+            <input type="text" class="form-control" name="branchAddresses[${branchCount}][country]" required>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Postal Code*</label>
+            <input type="text" class="form-control" name="branchAddresses[${branchCount}][postalCode]" required>
+          </div>
+          <div class="col-md-6">
+            <div class="form-check mt-4 pt-2">
+              <input class="form-check-input" type="checkbox" name="branchAddresses[${branchCount}][isPrimary]" id="isPrimary${branchCount}">
+              <label class="form-check-label" for="isPrimary${branchCount}">
+                Primary Branch
+              </label>
+            </div>
+          </div>
+        </div>
+      `;
+      container.appendChild(newBranch);
+      branchCount++;
+    });
+
+    // Ensure only one primary branch is selected
+    document.getElementById('clientForm').addEventListener('change', function(e) {
+      if (e.target.name.includes('[isPrimary]') && e.target.checked) {
+        document.querySelectorAll('input[name*="[isPrimary]"]').forEach(checkbox => {
+          if (checkbox !== e.target) {
+            checkbox.checked = false;
+          }
+        });
+      }
+    });
+  });
+</script>
 </body>
 </html>

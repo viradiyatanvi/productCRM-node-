@@ -5,19 +5,18 @@ const { isAuthenticated } = require('../middleware/auth');
 
 router.get('/clients-by-source', isAuthenticated ,async (req, res) => {
   try {
-    // Get all client sources with their client counts and details
-    const sources = await ClientSource.aggregate([
+    const sources = await ClientSource.aggregate([ // aggregation pipeline chalati he
       {
-        $lookup: {
+        $lookup: { // clientSource ko client k sath jodata he
           from: 'clients',
-          localField: '_id',
+          localField: '_id', // current sorce ki id
           foreignField: 'clientSource',
-          as: 'clients'
+          as: 'clients' // result me aek array banata he
         }
       },
       {
-        $addFields: {
-          clientCount: { $size: '$clients' },
+        $addFields: { 
+          clientCount: { $size: '$clients' }, //  total client
           activeClients: {
             $size: {
               $filter: {
@@ -43,11 +42,11 @@ router.get('/clients-by-source', isAuthenticated ,async (req, res) => {
 
     // Prepare data for chart
     const chartData = {
-      labels: sources.map(source => source.name),
+      labels: sources.map(source => source.name), 
       datasets: [
         {
-          label: 'Total Clients',
-          data: sources.map(source => source.clientCount),
+          label: 'Total Clients', // source k name
+          data: sources.map(source => source.clientCount), // dataset
           backgroundColor: 'rgba(54, 162, 235, 0.6)',
           borderColor: 'rgba(54, 162, 235, 1)',
           borderWidth: 1
@@ -71,8 +70,8 @@ router.get('/clients-by-source', isAuthenticated ,async (req, res) => {
 
     res.render('report/clientsBySource', {
       sources,
-      chartData: JSON.stringify(chartData),
-      user: req.session.user
+      chartData: JSON.stringify(chartData), // json formate me chart ka data
+      user: req.session.user  // total user
     });
 
   } catch (err) {

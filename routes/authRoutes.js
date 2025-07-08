@@ -10,24 +10,37 @@ router.get('/register', (req, res) => {
 
 // Register Post
 router.post('/register', [
-    body('name').notEmpty().withMessage('Name required'),
-    body('email').isEmail().withMessage('Valid email required'),
-    body('password').isLength({ min: 6 }).withMessage('Min 6 char password'),
-    body('role').isIn(['admin', 'sales', 'telecaller', 'support']).withMessage('Invalid role')
+  body('name').notEmpty().withMessage('Name required'),
+  body('email').isEmail().withMessage('Valid email required'),
+  body('password').isLength({ min: 6 }).withMessage('Min 6 char password'),
+  body('role').isIn(['admin', 'sales', 'telecaller', 'support']).withMessage('Invalid role')
 ], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.render('auth/register', { title: 'Register', error: errors.array()[0].msg });
-    }
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.render('auth/register', { title: 'Register', error: errors.array()[0].msg });
+  }
 
-    const { name, email, password, role } = req.body;
-    const existing = await User.findOne({ email });
-    if (existing) return res.render('auth/register', { title: 'Register', error: 'Email already exists' });
+  const { name, email, password, role } = req.body;
 
-    const user = new User({ name, email, password, role });
-    await user.save();
-    res.redirect('/');
-}); 
+  const existing = await User.findOne({ email });
+  if (existing) {
+    return res.render('auth/register', { title: 'Register', error: 'Email already exists' });
+  }
+
+  // Save user
+  const user = new User({ name, email, password, role });
+  await user.save();
+
+  req.session.user = {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role
+  };
+
+  res.redirect('/');
+});
+
 
 // Login Page
 router.get('/login', (req, res) => {

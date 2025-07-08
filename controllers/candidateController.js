@@ -2,6 +2,7 @@ const Candidate = require('../models/Candidate');
 const CandidateStatus = require('../models/CandidateStatusModel');
 const CandidateSource = require('../models/CandidateSource');
 const Contact = require('../models/Contact');
+const Job = require('../models/Job');
 
 exports.list = async (req, res) => {
   try {
@@ -9,6 +10,7 @@ exports.list = async (req, res) => {
       .populate('status')
       .populate('source')
       .populate('sourceContact')
+      .populate('workExperiences.jobTitle')
       .sort({ createdAt: -1 });
     res.render('candidates/list', { candidates, formData: req.body });
   } catch (err) {
@@ -22,11 +24,13 @@ exports.addForm = async (req, res) => {
     const statuses = await CandidateStatus.find();
     const sources = await CandidateSource.find();
     const contacts = await Contact.find().sort({ firstName: 1 });
+    const jobs = await Job.find({ status: 'active' }).sort({ title: 1 });
     
     res.render('candidates/add', { 
       statuses, 
       sources,
       contacts,
+      jobs,
       months: ['January', 'February', 'March', 'April', 'May', 'June', 
               'July', 'August', 'September', 'October', 'November', 'December'],
       currentYear: new Date().getFullYear(),
@@ -64,7 +68,8 @@ exports.create = async (req, res) => {
       candidateData.workExperiences = Array.isArray(req.body.workExperiences)
         ? req.body.workExperiences.map(exp => ({
             ...exp,
-            currentlyWorking: exp.currentlyWorking === 'on'
+            currentlyWorking: exp.currentlyWorking === 'on',
+            jobTitle: exp.jobTitle || null
           }))
         : [];
     }
@@ -80,26 +85,11 @@ exports.create = async (req, res) => {
     if (req.body.sourceContact) {
       const contact = await Contact.findById(req.body.sourceContact);
       if (contact) {
-        candidateData.billingStreet = contact.billingStreet;
-        candidateData.billingCity = contact.billingCity;
-        candidateData.billingState = contact.billingState;
-        candidateData.billingCode = contact.billingCode;
-        candidateData.billingCountry = contact.billingCountry;
-        
-        if (!contact.shippingSameAsBilling) {
-          candidateData.shippingStreet = contact.shippingStreet;
-          candidateData.shippingCity = contact.shippingCity;
-          candidateData.shippingState = contact.shippingState;
-          candidateData.shippingCode = contact.shippingCode;
-          candidateData.shippingCountry = contact.shippingCountry;
-        } else {
-          candidateData.shippingSameAsBilling = true;
-          candidateData.shippingStreet = contact.billingStreet;
-          candidateData.shippingCity = contact.billingCity;
-          candidateData.shippingState = contact.billingState;
-          candidateData.shippingCode = contact.billingCode;
-          candidateData.shippingCountry = contact.billingCountry;
-        }
+        candidateData.street = contact.billingStreet;
+        candidateData.city = contact.billingCity;
+        candidateData.state = contact.billingState;
+        candidateData.code = contact.billingCode;
+        candidateData.country = contact.billingCountry;
       }
     }
 
@@ -108,10 +98,12 @@ exports.create = async (req, res) => {
       const statuses = await CandidateStatus.find();
       const sources = await CandidateSource.find();
       const contacts = await Contact.find().sort({ firstName: 1 });
+      const jobs = await Job.find({ status: 'active' }).sort({ title: 1 });
       return res.render('candidates/add', { 
         statuses, 
         sources,
         contacts,
+        jobs,
         error: 'Passwords do not match',
         formData: req.body,
         months: ['January', 'February', 'March', 'April', 'May', 'June', 
@@ -129,10 +121,12 @@ exports.create = async (req, res) => {
     const statuses = await CandidateStatus.find();
     const sources = await CandidateSource.find();
     const contacts = await Contact.find().sort({ firstName: 1 });
+    const jobs = await Job.find({ status: 'active' }).sort({ title: 1 });
     res.render('candidates/add', { 
       statuses, 
       sources,
       contacts,
+      jobs,
       error: 'Error creating candidate: ' + err.message,
       formData: req.body,
       months: ['January', 'February', 'March', 'April', 'May', 'June', 
@@ -144,16 +138,19 @@ exports.create = async (req, res) => {
 
 exports.editForm = async (req, res) => {
   try {
-    const candidate = await Candidate.findById(req.params.id);
+    const candidate = await Candidate.findById(req.params.id)
+      .populate('workExperiences.jobTitle');
     const statuses = await CandidateStatus.find();
     const sources = await CandidateSource.find();
     const contacts = await Contact.find().sort({ firstName: 1 });
+    const jobs = await Job.find({ status: 'active' }).sort({ title: 1 });
     
     res.render('candidates/edit', { 
       candidate, 
       statuses, 
       sources,
       contacts,
+      jobs, 
       months: ['January', 'February', 'March', 'April', 'May', 'June', 
               'July', 'August', 'September', 'October', 'November', 'December'],
       currentYear: new Date().getFullYear()
@@ -183,7 +180,8 @@ exports.update = async (req, res) => {
     if (req.body.workExperiences) {
       updateData.workExperiences = req.body.workExperiences.map(exp => ({
         ...exp,
-        currentlyWorking: exp.currentlyWorking === 'on'
+        currentlyWorking: exp.currentlyWorking === 'on',
+        jobTitle: exp.jobTitle || null
       }));
     }
 
@@ -196,26 +194,11 @@ exports.update = async (req, res) => {
     if (req.body.sourceContact) {
       const contact = await Contact.findById(req.body.sourceContact);
       if (contact) {
-        updateData.billingStreet = contact.billingStreet;
-        updateData.billingCity = contact.billingCity;
-        updateData.billingState = contact.billingState;
-        updateData.billingCode = contact.billingCode;
-        updateData.billingCountry = contact.billingCountry;
-        
-        if (!contact.shippingSameAsBilling) {
-          updateData.shippingStreet = contact.shippingStreet;
-          updateData.shippingCity = contact.shippingCity;
-          updateData.shippingState = contact.shippingState;
-          updateData.shippingCode = contact.shippingCode;
-          updateData.shippingCountry = contact.shippingCountry;
-        } else {
-          updateData.shippingSameAsBilling = true;
-          updateData.shippingStreet = contact.billingStreet;
-          updateData.shippingCity = contact.billingCity;
-          updateData.shippingState = contact.billingState;
-          updateData.shippingCode = contact.billingCode;
-          updateData.shippingCountry = contact.billingCountry;
-        }
+        updateData.street = contact.billingStreet;
+        updateData.city = contact.billingCity;
+        updateData.state = contact.billingState;
+        updateData.code = contact.billingCode;
+        updateData.country = contact.billingCountry;
       }
     }
 
@@ -258,7 +241,8 @@ exports.view = async (req, res) => {
     const candidate = await Candidate.findById(req.params.id)
       .populate('status')
       .populate('source')
-      .populate('sourceContact');
+      .populate('sourceContact')
+      .populate('workExperiences.jobTitle');
     
     res.render('candidates/view', { candidate });
   } catch (err) {
@@ -267,7 +251,6 @@ exports.view = async (req, res) => {
   }
 };
 
-// API endpoint to fetch contact details
 exports.getContactDetails = async (req, res) => {
   try {
     const contact = await Contact.findById(req.params.id);

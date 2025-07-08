@@ -1,215 +1,469 @@
-<%- include('../layout') %>
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Client</title>
-    <style>
-        .attachment-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .attachment-actions {
-            margin-left: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Client</title>
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    .sidebar {
+      height: 100vh;
+      width: 220px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #343a40;
+      padding-top: 15px;
+      overflow-y: auto;
+      z-index: 1040;
+    }
+
+    .sidebar a {
+      padding: 10px 20px;
+      text-decoration: none;
+      font-size: 16px;
+      color: #ddd;
+      display: block;
+    }
+
+    .sidebar a:hover {
+      background-color: #495057;
+      color: #fff;
+    }
+
+    .sidebar .logo {
+      color: #fff;
+      font-size: 20px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .sidebar .dropdown a {
+      display: block;
+      padding: 10px;
+      cursor: pointer;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .sidebar .dropdown-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .sidebar .dropdown-list li a {
+      display: block;
+      padding: 8px 20px;
+      color: #ccc;
+      text-decoration: none;
+    }
+
+    .sidebar .dropdown-list li a:hover {
+      background-color: #495057;
+      color: #fff;
+    }
+
+    .rotate {
+      transform: rotate(180deg);
+    }
+
+    .navbar {
+      top: 0;
+      left: 220px;
+      right: 0;
+      position: fixed;
+      z-index: 1000;
+      width: calc(100% - 220px);
+      height: 56px;
+      background-color: #343a40;
+    }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 20px;
+      padding-top: 30px;
+    }
+
+    .branch-address-container {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+
+    .remove-branch {
+      float: right;
+      cursor: pointer;
+      color: red;
+      font-weight: bold;
+    }
+
+    .attachment-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
 </head>
+
 <body>
-    <div class="main-content">
-        <div class="container-fluid">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Edit Client</h4>
-                    <a href="/clients/<%= client._id %>" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-arrow-left me-1"></i> Back to Details
-                    </a>
-                </div>
-                <div class="card-body">
-                    <form action="/clients/<%= client._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Client Name*</label>
-                                <input type="text" class="form-control" name="clientName" value="<%= client.clientName %>" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Fax</label>
-                                <input type="text" class="form-control" name="fax" value="<%= client.fax %>">
-                            </div>
-                        </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Telegram*</label>
-                                <input type="text" class="form-control" name="telegram" value="<%= client.telegram %>" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Select Industry*</label>
-                                <select class="form-select" name="industry" required>
-                                    <% industries.forEach(industry => { %>
-                                        <option value="<%= industry._id %>" <%= client.industry.toString() === industry._id.toString() ? 'selected' : '' %>>
-                                            <%= industry.name %>
-                                        </option>
-                                    <% }) %>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">About</label>
-                            <textarea class="form-control" name="about" rows="3"><%= client.about %></textarea>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Contact Number*</label>
-                                <input type="text" class="form-control" name="contactNumber" value="<%= client.contactNumber %>" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Website</label>
-                                <input type="url" class="form-control" name="website" value="<%= client.website %>">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Server*</label>
-                                <input type="text" class="form-control" name="server" value="<%= client.server %>" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Select Source*</label>
-                                <select class="form-select" name="clientSource" required>
-                                    <% clientSources.forEach(source => { %>
-                                        <option value="<%= source._id %>" <%= client.clientSource.toString() === source._id.toString() ? 'selected' : '' %>>
-                                            <%= source.name %>
-                                        </option>
-                                    <% }) %>
-                                </select>
-                            </div>
-                        </div>
-
-                        <h4 class="mt-4">Billing Address Information</h4>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Billing Street*</label>
-                                <input type="text" class="form-control" name="billingStreet" value="<%= client.billingStreet %>" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Billing State*</label>
-                                <input type="text" class="form-control" name="billingState" value="<%= client.billingState %>" required>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Billing Country*</label>
-                                <input type="text" class="form-control" name="billingCountry" value="<%= client.billingCountry %>" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Billing City*</label>
-                                <input type="text" class="form-control" name="billingCity" value="<%= client.billingCity %>" required>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Billing Code*</label>
-                            <input type="text" class="form-control" name="billingCode" value="<%= client.billingCode %>" required>
-                        </div>
-
-                        <h4 class="mt-4">Shipping Address Information</h4>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Shipping Street</label>
-                                <input type="text" class="form-control" name="shippingStreet" value="<%= client.shippingStreet %>">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Shipping State</label>
-                                <input type="text" class="form-control" name="shippingState" value="<%= client.shippingState %>">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Shipping City</label>
-                                <input type="text" class="form-control" name="shippingCity" value="<%= client.shippingCity %>">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Shipping Code</label>
-                                <input type="text" class="form-control" name="shippingCode" value="<%= client.shippingCode %>">
-                            </div>
-                        </div>
-
-                        <h4 class="mt-4">Attachment Information</h4>
-                        
-                        <% if (client.attachments && client.attachments.length > 0) { %>
-                            <div class="mb-3">
-                                <label class="form-label">Current Attachments</label>
-                                <% client.attachments.forEach((attachment, index) => { %>
-                                    <div class="attachment-item">
-                                        <i class="fas fa-file-alt me-2"></i>
-                                        <span><%= attachment.originalname %></span>
-                                        <div class="attachment-actions">
-                                            <a href="/uploads/<%= attachment.filename %>" download class="text-primary me-2">
-                                                <i class="fas fa-download"></i>
-                                            </a>
-                                            <a href="/uploads/<%= attachment.filename %>" target="_blank" class="text-info me-2">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="#" class="text-danger" onclick="deleteAttachment('<%= client._id %>', '<%= attachment._id %>')">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                <% }) %>
-                            </div>
-                        <% } %>
-
-                        <div class="mb-3">
-                            <label class="form-label">Add New Files</label>
-                            <input type="file" class="form-control" name="attachments" multiple>
-                        </div>
-
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-1"></i> Update Client
-                            </button>
-                            <a href="/clients/<%= client._id %>" class="btn btn-secondary">
-                                <i class="fas fa-times me-1"></i> Cancel
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+  <div class="sidebar">
+    <div class="logo">
+      <i class="fas fa-chart-line me-2"></i> CRM Panel
     </div>
 
-    <script>
-        function deleteAttachment(clientId, attachmentId) {
-            if (confirm('Are you sure you want to delete this attachment?')) {
-                fetch(`/clients/${clientId}/attachments/${attachmentId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then(response => {
-                    if (response.ok) {
-                        location.reload();
-                    } else {
-                        alert('Error deleting attachment');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error deleting attachment');
-                });
+    <a href="/"><i class="fas fa-home me-2"></i>Dashboard</a>
+    <a href="/leads"><i class="fas fa-user-plus me-2"></i>Leads</a>
+    <a href="/customers"><i class="fas fa-users me-2"></i>Customers</a>
+    <a href="/job"><i class="fas fa-briefcase me-1"></i> Jobs</a>
+    <a href="/clients"><i class="fas fa-building me-1"></i> Clients</a>
+    <a href="/contact"><i class="fas fa-address-book me-2"></i>Contacts</a>
+    <a href="/candidates"><i class="fas fa-user-graduate me-2"></i>Candidates</a>
+    <a href="/note"><i class="fas fa-sticky-note me-2"></i>Notes</a>
+    <a href="/manager"><i class="fas fa-building me-2"></i>Office</a>
+    <a href="/products"><i class="fas fa-box me-2"></i>Products</a>
+    <a href="/sales"><i class="fas fa-dollar-sign me-2"></i>Sales</a>
+    <a href="/tickets"><i class="fas fa-ticket-alt me-2"></i>Tickets</a>
+    <a href="/quotations"><i class="fas fa-file-invoice me-2"></i>Quotations</a>
+
+    <!-- Reports Dropdown -->
+    <div class="dropdown">
+      <a href="javascript:void(0)" onclick="toggleDropdown('reportDropdown', 'chevronReport')">
+        <i class="fas fa-file-alt me-2"></i> Reports
+        <i id="chevronReport" class="fas fa-chevron-up float-end mt-2"></i>
+      </a>
+      <ul id="reportDropdown" class="dropdown-list" style="display: none; margin-left: 20px;">
+        <li><a href="/reports/clients-by-industry">Clients By Industry</a></li>
+        <li><a href="/reports/jobs-by-status">Jobs By Status</a></li>
+        <li><a href="/reports/jobs-by-industry">Jobs By Industry</a></li>
+        <li><a href="/reports/jobs-by-type">Jobs By Type</a></li>
+        <li><a href="/reports/clients-by-source">Clients By Source</a></li>
+      </ul>
+    </div>
+
+    <!-- Candidate Setup Dropdown -->
+    <div class="dropdown">
+      <a href="javascript:void(0)" onclick="toggleDropdown('candidateDropdown', 'chevronCandidate')">
+        <i class="fas fa-cogs me-2"></i> Candidate Setup
+        <i id="chevronCandidate" class="fas fa-chevron-up float-end mt-2"></i>
+      </a>
+      <ul id="candidateDropdown" class="dropdown-list" style="display: none; margin-left: 20px;">
+        <li><a href="/candidate/source">Candidate Source</a></li>
+        <li><a href="/candidate/status">Candidate Status</a></li>
+        <li><a href="/client/cientSource">Client Source</a></li>
+        <li><a href="/note/notetype">Note Type</a></li>
+        <li><a href="/industries">Industries</a></li>
+        <li><a href="/job-open-status">Open Job Status</a></li>
+        <li><a href="/job-type">Job Type</a></li>
+      </ul>
+    </div>
+
+
+    <a href="/auth/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm" style="position: fixed;">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">
+        <h2>Product CRM</h2>
+      </span>
+
+      <div class="d-flex">
+        <span class="navbar-text me-3">
+          <i class="fas fa-user-circle me-1"></i>
+          <%= (typeof user !=='undefined' && user && user.name) ? user.name : 'User' %>
+        </span>
+        <a href="/auth/logout" class="btn btn-outline-secondary btn-sm">
+          <i class="fas fa-sign-out-alt me-1 mt-2"></i>Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content mt-5">
+    <div class="card">
+      <div class="card-header">
+        <h2>Edit Client</h2>
+      </div>
+      <div class="card-body">
+        <form action="/clients/<%= client._id %>/update" method="POST" enctype="multipart/form-data">
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Client Name*</label>
+              <input type="text" class="form-control" name="clientName" value="<%= client.clientName %>" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" name="email" value="<%= client.email %>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Company Name*</label>
+              <input type="text" class="form-control" name="companyName" value="<%= client.companyName %>" required>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Contact Number*</label>
+              <input type="text" class="form-control" name="contactNumber" value="<%= client.contactNumber %>" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Alternative Number</label>
+              <input type="text" class="form-control" name="alternativeNumber" value="<%= client.alternativeNumber %>">
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Select Industry*</label>
+              <select class="form-select" name="industry" required>
+                <% industries.forEach(industry=> { %>
+                  <option value="<%= industry._id %>" <%=client.industry.equals(industry._id) ? 'selected' : '' %>>
+                    <%= industry.name %>
+                  </option>
+                  <% }) %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Website</label>
+              <input type="url" class="form-control" name="website" value="<%= client.website %>">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">About</label>
+            <textarea class="form-control" name="about" rows="3"><%= client.about %></textarea>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Server*</label>
+              <input type="text" class="form-control" name="server" value="<%= client.server %>" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Select Source*</label>
+              <select class="form-select" name="clientSource" required>
+                <% clientSources.forEach(source=> { %>
+                  <option value="<%= source._id %>" <%=client.clientSource.equals(source._id) ? 'selected' : '' %>>
+                    <%= source.name %>
+                  </option>
+                  <% }) %>
+              </select>
+            </div>
+          </div>
+
+          <h4 class="mt-4">Branch Addresses</h4>
+          <div id="branchAddressesContainer">
+            <% client.branchAddresses.forEach((branch, index)=> { %>
+              <div class="branch-address-container">
+                <% if(index> 0) { %>
+                  <span class="remove-branch" onclick="this.parentElement.remove()">×</span>
+                  <% } %>
+                    <div class="row mb-3">
+                      <div class="col-md-6">
+                        <label class="form-label">Branch Name*</label>
+                        <input type="text" class="form-control" name="branchAddresses[<%= index %>][branchName]"
+                          value="<%= branch.branchName %>" required>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">Branch Number*</label>
+                        <input type="text" class="form-control" name="branchAddresses[<%= index %>][branchNumber]"
+                          value="<%= branch.branchNumber %>" required>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <div class="col-md-6">
+                        <label class="form-label">Street*</label>
+                        <input type="text" class="form-control" name="branchAddresses[<%= index %>][street]"
+                          value="<%= branch.street %>" required>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">City*</label>
+                        <input type="text" class="form-control" name="branchAddresses[<%= index %>][city]"
+                          value="<%= branch.city %>" required>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <div class="col-md-6">
+                        <label class="form-label">State*</label>
+                        <input type="text" class="form-control" name="branchAddresses[<%= index %>][state]"
+                          value="<%= branch.state %>" required>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">Country*</label>
+                        <input type="text" class="form-control" name="branchAddresses[<%= index %>][country]"
+                          value="<%= branch.country %>" required>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <div class="col-md-6">
+                        <label class="form-label">Postal Code*</label>
+                        <input type="text" class="form-control" name="branchAddresses[<%= index %>][postalCode]"
+                          value="<%= branch.postalCode %>" required>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-check mt-4 pt-2">
+                          <input class="form-check-input" type="checkbox"
+                            name="branchAddresses[<%= index %>][isPrimary]" id="isPrimary<%= index %>"
+                            <%=branch.isPrimary ? 'checked' : '' %>>
+                          <label class="form-check-label" for="isPrimary<%= index %>">
+                            Primary Branch
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+              </div>
+              <% }); %>
+          </div>
+
+          <button type="button" class="btn btn-secondary mb-3" id="addBranchBtn">+</button>
+
+          <h4 class="mt-4">Attachment Information</h4>
+
+          <% if(client.attachments && client.attachments.length> 0) { %>
+            <div class="mb-3">
+              <label class="form-label">Current Attachments</label>
+              <div class="list-group">
+                <% client.attachments.forEach((attachment, index)=> { %>
+                  <div class="attachment-item">
+                    <a href="/uploads/<%= attachment.filename %>" target="_blank">
+                      <%= attachment.originalname %>
+                    </a>
+                    <!-- <button type="button" class="btn btn-sm btn-danger"
+                      onclick="removeAttachment(<%= index %>)">Remove</button> -->
+                  </div>
+                  <% }); %>
+              </div>
+            </div>
+            <% } %>
+
+              <div class="mb-3">
+                <label class="form-label">Add New Files</label>
+                <input type="file" class="form-control" name="attachments" multiple>
+              </div>
+
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn text-white" style="background-color: #343a40;">Update Client</button>
+                <a href="/clients" class="btn btn-secondary">Cancel</a>
+              </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      let branchCount = <%= client.branchAddresses.length %>;
+
+      // Add new branch address
+      document.getElementById('addBranchBtn').addEventListener('click', function () {
+        const container = document.getElementById('branchAddressesContainer');
+        const newBranch = document.createElement('div');
+        newBranch.className = 'branch-address-container';
+        newBranch.innerHTML = `
+        <span class="remove-branch" onclick="this.parentElement.remove()">×</span>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Branch Name*</label>
+            <input type="text" class="form-control" name="branchAddresses[${branchCount}][branchName]" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Branch Number*</label>
+            <input type="text" class="form-control" name="branchAddresses[${branchCount}][branchNumber]" required>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Street*</label>
+            <input type="text" class="form-control" name="branchAddresses[${branchCount}][street]" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">City*</label>
+            <input type="text" class="form-control" name="branchAddresses[${branchCount}][city]" required>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">State*</label>
+            <input type="text" class="form-control" name="branchAddresses[${branchCount}][state]" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Country*</label>
+            <input type="text" class="form-control" name="branchAddresses[${branchCount}][country]" required>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Postal Code*</label>
+            <input type="text" class="form-control" name="branchAddresses[${branchCount}][postalCode]" required>
+          </div>
+          <div class="col-md-6">
+            <div class="form-check mt-4 pt-2">
+              <input class="form-check-input" type="checkbox" name="branchAddresses[${branchCount}][isPrimary]" id="isPrimary${branchCount}">
+              <label class="form-check-label" for="isPrimary${branchCount}">
+                Primary Branch
+              </label>
+            </div>
+          </div>
+        </div>
+      `;
+        container.appendChild(newBranch);
+        branchCount++;
+      });
+
+      // Ensure only one primary branch is selected
+      document.getElementById('clientForm').addEventListener('change', function (e) {
+        if (e.target.name.includes('[isPrimary]') && e.target.checked) {
+          document.querySelectorAll('input[name*="[isPrimary]"]').forEach(checkbox => {
+            if (checkbox !== e.target) {
+              checkbox.checked = false;
             }
+          });
         }
-    </script>
+      });
+    });
+
+    function removeAttachment(index) {
+      alert('Attachment removal functionality would be implemented here');
+    }
+  </script>
+  <script>
+    function toggleDropdown(dropdownId, iconId) {
+      const dropdown = document.getElementById(dropdownId);
+      const icon = document.getElementById(iconId);
+
+      if (dropdown.style.display === "none" || dropdown.style.display === "") {
+        dropdown.style.display = "block";
+        icon.classList.add("rotate");
+      } else {
+        dropdown.style.display = "none";
+        icon.classList.remove("rotate");
+      }
+    }
+  </script>
 </body>
+
 </html>

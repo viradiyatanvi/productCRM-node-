@@ -157,7 +157,7 @@ router.post('/edit/:id', isStaff, [
       
       return res.render('customers/edit', {
         title: 'Edit Customer',
-        customer: { ...customer.toObject(), ...req.body },
+        customer: { ...customer.toObject(), ...req.body }, // javascript object me badalata he value ko spread karta he.
         users,
         user: req.session.user,
         error: errors.array()[0].msg,

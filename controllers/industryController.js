@@ -29,7 +29,7 @@ exports.store = async (req, res) => {
   } catch (err) {
     if (err.name === 'ValidationError') {
       req.flash('error_msg', Object.values(err.errors).map(val => val.message));
-    } else if (err.code === 11000) {
+    } else if (err.code === 11000) { // error deta he
       req.flash('error_msg', 'Industry with this name already exists');
     } else {
       req.flash('error_msg', 'Error creating industry');
